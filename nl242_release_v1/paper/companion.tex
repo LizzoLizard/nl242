@@ -506,7 +506,7 @@ The main paper separates its evidence into three layers.
 \begin{itemize}[nosep]
   \item The Lean formalization is under active development. Modules marked $^\dagger$ are not yet in the public replay archive; for the results they cover, the prose and the packets are the evidence.
   \item This is a computer-assisted proof. Its correctness includes the correctness of the published code, which is why all of it is published and the heaviest parts were replayed independently.
-  \item At $t=100$, rank $6$, every verifier has been replayed, and the full case reductions (including the Branch~I weight-$16$ normalization and $22$-bit subcube syndrome, the Branch~II-B hand closures, and the complete $45$-pair $(h,p)$ scan at $|Z|=112$) are written out in \code{t100.tex} and checked by \code{t100\_r6\_audit/verify\_z128\_reductions.cpp} and \code{verify\_z112\_all45\_exact.cpp}.
+  \item At $t=100$, rank $6$, every verifier has been replayed, and the full case reductions (including the Branch~I weight-$16$ normalization and $22$-bit subcube syndrome in Lemma~5.2, the Branch~II-B hand closures, and the complete $45$-pair $(h,p)$ scan at $|Z|=112$) are written out in \code{t100.tex} and packaged directly inside \code{nl242\_top\_closure.zip} (\code{t100/z128/verify\_z128\_reductions.cpp}, \code{t100/z112/check\_small\_masks.cpp}, and \code{t100/z112/verify\_z112\_all45\_exact.cpp}, mirrored in \code{t100\_r6\_audit/}).
 \end{itemize}
 
 \paragraph{Checking it yourself.} Each packet's README gives the commands and the expected output. Good first replays:

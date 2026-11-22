@@ -5,7 +5,7 @@
 [![Lean](https://img.shields.io/badge/Lean%20formalization-in%20development-informational.svg)](#trust-boundary)
 [![Axioms](https://img.shields.io/badge/sorry%20%7C%20native__decide-0%20%7C%200-success.svg)](#trust-boundary)
 
-<!-- [TODO: Insert Zenodo DOI badge after first GitHub release] -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24447815.svg)](https://doi.org/10.5281/zenodo.24447815)
 
 **The maximum nonlinearity of a balanced nine-variable Boolean function is exactly 240.** Thus $n = 9$ is the smallest odd dimension in which requiring balance strictly lowers the maximum nonlinearity below the covering radius ($240 < 242 \le \rho(1,9)$, whereas balanced functions attain $\rho(1,n) = 0, 2, 12, 56$ for $n = 1, 3, 5, 7$). The **zero-Mathlib Lean 4** master theorem (`79` compiled modules, zero `sorry`) formally reduces the coordinate-free theorem to explicit finite computational hypotheses, each discharged by written reductions (including `paper/t100.tex` for $t = 100$, rank $6$) and SHA-256-manifested replay packets — with the final $t = 114, 116$ endpoint verified by **three independent proofs** (`nl242_endpoint_closure.zip`, `nl242_endpoint_crosscheck.zip`, and `nl244_verify.zip`).
 
@@ -58,14 +58,15 @@ Instead of testing individual colorings, we prove **global structural laws about
 ## Quick Verification (1-Click Colab or Local)
 
 ### Option A: One-Click Google Colab (Free CPU Runtime, ~1–1.7 GB RAM)
-1. Open `colab/verify_nl242_colab.ipynb` in Google Colab.
-2. Upload `colab/nl242_lean_colab.tar.gz` (389 KB) when prompted.
-3. Click **Run All**. It installs Lean 4.15.0 via `elan`, audits zero `sorry`/`native_decide`/`axiom`, and compiles all **79 modules** in the archive sequentially from scratch.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/LizzoLizard/nl242/blob/main/nl242_release_v1/lean/verify_nl242_colab.ipynb)
+
+1. Open [lean/verify_nl242_colab.ipynb](lean/verify_nl242_colab.ipynb) directly in Google Colab via the badge above.
+2. Click **Run All**. Cell 2 automatically downloads [lean/nl242_lean_colab.tar.gz](lean/nl242_lean_colab.tar.gz) (389 KB) from GitHub (with manual upload fallback if offline), installs Lean 4.15.0 via `elan`, audits zero `sorry`/`native_decide`/`axiom`, and compiles all **79 modules** sequentially from scratch.
 
 ### Option B: Local Replay (macOS / Linux)
 Requires only `lean` v4.15.0 (no Mathlib, no Lake cache needed):
 ```bash
-tar -xzf colab/nl242_lean_colab.tar.gz
+tar -xzf lean/nl242_lean_colab.tar.gz
 cd nl242_lean
 ./replay_all.sh
 ```
@@ -98,7 +99,7 @@ We explicitly separate the verification into three transparent layers (see Secti
 
 ## Theorem Map
 
-See [paper/paper.tex](paper.tex) (Table 2) and `lean/LEAN_PROOF.md` for the theorem-by-theorem cross-reference. The formalization is still being developed, so module counts change between snapshots.
+See [paper/paper.tex](paper/paper.tex) (Table 2), [paper/t100.tex](paper/t100.tex) (Section 5 for $t = 100$, rank $6$), and [lean/LEAN_PROOF.md](lean/LEAN_PROOF.md) (including the resolved November 22, 2026 replay audit) for the theorem-by-theorem cross-reference.
 
 ## Acknowledgments & Author's Note
 
@@ -108,13 +109,13 @@ The author thanks AI research and coding assistants — **Antigravity (Google)**
 
 ## Citation
 
-<!-- [TODO: Update DOI and arXiv/IACR identifiers after release] -->
 ```bibtex
 @misc{shittu2026nl242,
   author       = {Daniel Ayomide Shittu},
   title        = {No Balanced 9-Variable Boolean Function Has Nonlinearity 242: Spectral-Phase Obstructions, Formalized Exclusions, and Exact Certificates},
   year         = {2026},
   howpublished = {Preprint and Lean 4 formalization},
-  note         = {GitHub: [GITHUB_URL], Zenodo DOI: [ZENODO_DOI]}
+  doi          = {10.5281/zenodo.24447815},
+  url          = {https://github.com/LizzoLizard/nl242}
 }
 ```

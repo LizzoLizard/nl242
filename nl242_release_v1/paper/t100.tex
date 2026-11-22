@@ -368,17 +368,17 @@ Now apply the exact global symmetry $v'_{ab}(y)=(-1)^s v_{ab}(y+(0,y'))$ simulta
   \item on $H$, $z_{00}\equiv2\pmod 4$, so negating $z_{00}$ flips $((z_{00}-2)/4)\bmod2$, yielding $p'_{00}|_H=p_{00}|_H+(s+y'\cdot c')=p_{00}|_{H^c}=p'_{00}|_{H^c}$;
   \item on $H$, $z_{01}\equiv0\pmod 4$, so negating $z_{01}$ leaves $p_{01}|_H$ unchanged ($p'_{01}|_H=p_{01}|_H$).
 \end{itemize}
-Thus every admissible configuration has a representative with $p'_{00}|_H=p'_{00}|_{H^c}$, and its companion pair $(v'_{01},v'_{11})$ must admit a valid $L_0$-half on $H$ for $p'_{01}|_H$ (\code{has\_L0\_any}).
+Thus every admissible configuration has a representative with $p'_{00}|_H=p'_{00}|_{H^c}$ (indexed in \code{solve\_branchI\_wt16\_fast} by $c_0=c\bmod2$, $c'=c\gg1$, with $p'_5\in\RM(2,5)$ running over all $65{,}536$ quadratic functions), and its companion pair $(v'_{01},v'_{11})$ must admit a valid $L_0$-half on $H$ for $p'_{01}|_H\in\RM(2,5)$ (\code{has\_L0\_any}; negating $(v_{01},v_{11})$ in frequency space swaps $(z_{00},z_{10})\leftrightarrow(z_{01},z_{11})$ while fixing $(q,d_c,k_c)$, so the admissible $(z_{01},z_{11})$ pairs on $H$ coincide identically with \code{opts\_L0}).
 
 For the $22$-bit syndrome, put $A(c):=z_{00}(c)+z_{10}(c)=\widehat{v_{00}+v_{10}}(c)$. For every mask $m\in\F_2^6$ of weight $r\in\{4,5,6\}$ ($\binom64+\binom65+\binom66=22$ masks),
 \[
   \sum_{c\subseteq m}A(c)=2^r\sum_{y:\,y_i=0\,\forall i\in m}\big(v_{00}(y)+v_{10}(y)\big)\equiv0\pmod{16},
 \]
-since $16\mid 2^r$. Exhaustive verification over all admissible local tuples with $k_c=0$ and $d_c\in\{0,1\}$ gives the exact pointwise congruence
+since $16\mid 2^r$. Exhaustive verification over all $64$ admissible local tuples with $k_c=0$ and $d_c\in\{0,1\}$ (checked programmatically in \code{verify\_z128\_reductions.cpp}, Pass~5) confirms that the explicit table in \code{solve\_branchI\_wt16\_fast} obeys the exact pointwise congruence
 \[
   A(c)\equiv A_{\mathrm{base}}[c]+8\Big((M_{\mathrm{self}}[c]\wedge p_{00}(c))\oplus(M_{\mathrm{other}}[c]\wedge p_{01}(c))\oplus s_A(c)\Big)\pmod{16},
 \]
-where $s_A(c)=\ind[(A(c)-4)\bmod16=8]$ on the $8$ defect sites $H^c\cap U$ and $0$ elsewhere. Summing over $c\subseteq m$ modulo $16$ forces $\mathrm{syn}_{\mathrm{base}}\oplus\mathrm{syn}_{\mathrm{self}}\oplus\mathrm{syn}_{\mathrm{other}}\oplus\mathrm{syn}_{s_A}=0$ on all $22$ masks. Whereas the general solver \code{solve\_branchI\_rest} leaves $589{,}824$ uncoupled joins per orbit (taking the union over all $256$ masks $s_A$ without coupling each $L_0$-half's realized $s_A$ to $p_{01}|_H$ or checking \code{has\_L0\_any}), enforcing these exact necessary conditions in \code{solve\_branchI\_wt16\_fast} yields $0$ joins in $1.4\,\mathrm{s}$ per orbit.
+where $s_A(c)=\ind[(A(c)-4)\bmod16=8]$ on the $8$ defect sites $H^c\cap U$ and $0$ elsewhere. Summing over $c\subseteq m$ modulo $16$ forces $\mathrm{syn}_{\mathrm{base}}\oplus\mathrm{syn}_{\mathrm{self}}\oplus\mathrm{syn}_{\mathrm{other}}\oplus\mathrm{syn}_{s_A}=0$ on all $22$ masks (matching \code{base\_syndrome6} and \code{deg456\_bits6} bit-for-bit, with exact ternary join condition \code{pk} parity match and disjoint $|x|=2$ masks \code{tw0}, \code{tw1}). Whereas the general solver \code{solve\_branchI\_rest} leaves $589{,}824$ uncoupled joins per orbit (taking the union over all $256$ masks $s_A$ without coupling each $L_0$-half's realized $s_A$ to $p_{01}|_H$ or checking \code{has\_L0\_any}), enforcing these exact necessary conditions in \code{solve\_branchI\_wt16\_fast} yields $0$ joins in $1.4\,\mathrm{s}$ per orbit.
 \end{proof}
 
 \paragraph{Branch~II-A ($L_{00}=0$, $L_{01}=1$, $u\neq0$).}

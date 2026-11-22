@@ -462,6 +462,85 @@ static void verify_branch_IIB() {
               << "II-B4 10/10 orbits cover 5040/5040 isotropic 2-planes!\n";
 }
 
+// 5. Verify Lemma wt16 code-vs-math correspondence with solve_branchI_wt16_fast.cpp!
+static void verify_wt16_implementation() {
+    // (a) Exhaustively verify the (Abase, M_self, M_other, s_A) mod-16 congruence table
+    //     from solve_branchI_wt16_fast.cpp lines 220-228 across all admissible local 4-tuples (kc=0, dc in {0,1}),
+    //     and verify opts_L0 symmetry for (v01, v11) on H via (v01, v11) -> (-v01, -v11).
+    int checked = 0;
+    std::set<std::tuple<int, int, int, int, int>> L0_z00_set, L0_z01_set;
+    for (int q = 0; q < 2; ++q) {
+        std::vector<int> w0s = (q == 0) ? std::vector<int>{-8, 0, 8} : std::vector<int>{-12, -4, 4, 12};
+        std::vector<int> w1s = (q == 0) ? std::vector<int>{-12, -4, 4, 12} : std::vector<int>{-8, 0, 8};
+        for (int v00 : w0s) for (int v01 : w0s) for (int v10 : w1s) for (int v11 : w1s) {
+            int dc = (q == 0) ? ((v00 == 0) + (v01 == 0)) : ((v10 == 0) + (v11 == 0));
+            int kc = (q == 0) ? ((std::abs(v10) == 4) + (std::abs(v11) == 4)) : ((std::abs(v00) == 4) + (std::abs(v01) == 4));
+            if (kc != 0 || dc > 1) continue;
+            int Ah = (v00 + v01) / 2, Ch = (v00 - v01) / 2;
+            int Bh = (v10 + v11) / 2, Dh = (v10 - v11) / 2;
+            int z0 = (Ah + Bh) / 2, z1 = (Ah - Bh) / 2, z2 = (Ch + Dh) / 2, z3 = (Ch - Dh) / 2;
+            int A = z0 + z1;
+            int Abase = 0, ms = 0, mo = 0, sA = 0, p0 = 0, po = 0;
+            if ((z0 & 3) == 0 && (z1 & 3) == 0) {
+                p0 = (z0 >> 2) & 1;
+                L0_z00_set.insert({q, dc, p0, z0, z1});
+                if (dc == 0) { ms = (q == 0) ? 1 : 0; }
+                else {
+                    Abase = 4;
+                    if (((A % 8) + 8) % 8 != 4) throw std::logic_error("wt16 H^c dc=1 A mod 8 != 4");
+                    sA = ((((A - 4) % 16) + 16) % 16 == 8) ? 1 : 0;
+                }
+            } else if ((z0 & 3) == 2 && (z1 & 3) == 2) {
+                p0 = ((z0 - 2) >> 2) & 1;
+                po = (z2 >> 2) & 1;
+                L0_z01_set.insert({q, dc, po, z2, z3});
+                if (dc == 0) { Abase = (q == 0) ? 8 : 12; mo = 1; ms = (q == 1) ? 1 : 0; }
+                else         { Abase = (q == 0) ? 4 : 0;  mo = 0; ms = (q == 0) ? 1 : 0; }
+            } else continue;
+            int pred = (Abase + 8 * ((ms & p0) ^ (mo & po) ^ sA)) & 15;
+            int actual = ((A % 16) + 16) % 16;
+            if (pred != actual) throw std::logic_error("wt16 mod-16 congruence mismatch!");
+            checked++;
+        }
+    }
+    if (checked != 64 || L0_z00_set != L0_z01_set)
+        throw std::logic_error("wt16 local tuple count or L0 symmetry mismatch!");
+
+    // (b) Verify both wt16 orbits have |H^c cap U| = |H cap U| = 8 and valid mod-8 base syndrome.
+    for (uint64_t u : {0xfaaa500050005000ULL, 0xaafa005000500050ULL}) {
+        int cHc = 0, cH = 0;
+        std::array<int, 64> Abase{};
+        for (int c = 0; c < 64; ++c) {
+            int q = q6[c], dc = (u >> c) & 1;
+            if ((c & 1) == 0) { if (dc) { Abase[c] = 4; cHc++; } }
+            else { if (dc == 0) Abase[c] = q ? 12 : 8; else { Abase[c] = q ? 0 : 4; cH++; } }
+        }
+        if (cHc != 8 || cH != 8) throw std::logic_error("wt16 |H^c cap U| != 8");
+        for (int m = 0; m < 64; ++m) if (__builtin_popcount(m) >= 4) {
+            int s = 0; for (int c = 0; c < 64; ++c) if ((c & ~m) == 0) s += Abase[c];
+            if (s & 7) throw std::logic_error("wt16 base_syndrome6 failed mod 8");
+        }
+    }
+
+    // (c) Positive control for the 22-bit subcube syndrome on 200 deterministic ternary (v00, v10) pairs.
+    uint64_t rng = 0x123456789abcdef0ULL;
+    for (int t = 0; t < 200; ++t) {
+        std::array<int, 64> g{};
+        for (int y = 0; y < 64; ++y) {
+            rng ^= rng << 13; rng ^= rng >> 7; rng ^= rng << 17;
+            int v0 = int(rng % 3) - 1, v1 = int((rng >> 8) % 3) - 1;
+            g[y] = v0 + v1;
+        }
+        auto A = g; fwht64(A);
+        for (int m = 0; m < 64; ++m) if (__builtin_popcount(m) >= 4) {
+            int s = 0; for (int c = 0; c < 64; ++c) if ((c & ~m) == 0) s += A[c];
+            if (s & 15) throw std::logic_error("wt16 subcube mod-16 positive control failed!");
+        }
+    }
+    std::cout << "[PASS 5] Branch I wt16 implementation check: 64/64 local tuples match solve_branchI_wt16_fast "
+              << "mod-16 table, opts_L0 H<->H^c symmetry exact, |H^c cap U|=|H cap U|=8, 22-bit subcube PC passed!\n";
+}
+
 int main() {
     auto t0 = std::chrono::steady_clock::now();
     init();
@@ -469,6 +548,7 @@ int main() {
     verify_branch_I();
     verify_branch_IIA();
     verify_branch_IIB();
+    verify_wt16_implementation();
     double dt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
     std::cout << "=== ALL |Z|=128 REDUCTIONS & ORBIT TABLES VERIFIED 100% EXACT IN " << dt << "s! ===\n";
     return 0;
