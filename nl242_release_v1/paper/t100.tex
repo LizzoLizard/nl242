@@ -1,0 +1,610 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\wt}{\operatorname{wt}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\lo}{\mathrm{lo}}
+\newcommand{\hi}{\mathrm{hi}}
+\newcommand{\RM}{\mathrm{RM}}
+\newcommand{\code}[1]{\texttt{#1}}
+\DeclareRobustCommand{\_}{\textunderscore\allowbreak}
+\newcommand{\main}{\cite{Main}}
+
+\newenvironment{status}{\begin{quote}\small\textbf{Status.}\ }{\end{quote}}
+
+\title{The Case $t=100$}
+\author{Daniel Ayomide Shittu}
+\date{A note accompanying \emph{No Balanced $9$-Variable Boolean Function Has Nonlinearity $242$}\\[2pt] November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Agreement count $t=100$ is where the two halves of the proof in~\main{} meet, and it is the busiest case of the top window: its defect budgets are the largest, and at rank~$8$ the binary quadratic-residue code of length~$17$ comes within one step of producing a function. This note collects the whole case in one place. Ranks $0$, $2$ and $4$ are excluded by a short hand argument that replaces a linear-programming search. At rank~$8$ we prove the structural lemmas in full: a mod-$4$ law for hyperplane counts, the fact that the zeros of the low block determine everything else, and the hand exclusion of the smallest case. We then state exactly what the computer checks, and why each reduction it uses is valid. At rank~$6$ we prove every structural reduction behind both $|Z|=128$ and $|Z|=112$, regenerate all hard-coded orbit tables from scratch, close Branches~II-B2, II-B3 and $(h,p)=(0,0)$ by hand, and record three gaps caught and closed during the full audit of $|Z|=112$.
+\end{abstract}
+
+\tableofcontents
+
+% ===========================================================================
+\section{Why $t=100$}
+% ===========================================================================
+
+The main proof cuts a putative balanced $F:\F_2^9\to\F_2$ with $\max|W_F|\le28$ into two halves on $\F_2^8$ and records their agreement count $t$. Two engines then work inwards: a bottom-up one built on the high block (closing $t\le98$) and a top-down one built on the low block (closing $t\ge100$). They meet at the seam $98\mid100$, so $t=100$ is the first case the top-down engine must handle, and the hardest one it handles.
+
+Three things make it worth a separate account.
+\begin{itemize}[nosep]
+\item \textbf{Large budgets.} The low-block defect budget at $t=100$ is $16$, $26$ or $36$ depending on the case, against $4$ at $t=108$, where a one-line energy bound suffices.
+\item \textbf{A near miss.} At rank~$8$ the zeros of the low block can form the geometry of $\mathrm{QR}(17)$. One step up, at $t=102$, that geometry carries a genuine low block, which only the high block kills. At $t=100$ it fails already on the low side, after $53{,}550$ candidate placements are checked.
+\item \textbf{Mixed evidence.} Some parts close by hand, some by exact certificates, and some by exhaustive search. This note says which is which.
+\end{itemize}
+
+\paragraph{What is new here.} Section~\ref{sec:low} replaces the computational exclusion of ranks $0,2,4$ by a hand proof. Section~\ref{sec:r8} writes out proofs of the rank-$8$ lemmas that the packets state or use (the mod-$4$ law, the determination of everything by the zero set, the uniqueness of the phase on $F$, the mod-$8$ system, the top-$100$ bound) and a uniform hand proof of the case $n_0=10$. Section~\ref{sec:r6} proves all five rank-$6$ reductions that were previously justified only in source comments, closes Branches~II-B2, II-B3 and $(h,p)=(0,0)$ by hand, regenerates every orbit list from scratch, and closes three gaps found in the original $|Z|=112$ verifiers. Everything else is a guided account of~\main{} and of the replay packet \code{nl242\_top\_closure.zip}.
+
+% ===========================================================================
+\section{Setup at $t=100$}\label{sec:setup}
+% ===========================================================================
+
+We use the notation of~\main{}. In the adapted coordinates, $V,U:\F_2^8\to\{-1,0,1\}$ are the agreement and disagreement tables, with complementary supports of sizes $t=100$ and $156$. The low and high blocks are $\lo=2\widehat V$ and $\hi=2\widehat U$; they are the two halves of $W_F$, so $|\lo|,|\hi|\le28$. The parity facts give $\lo\equiv0\pmod 8$ and $\hi\equiv4\pmod 8$. We write
+\[
+  f=\widehat V/4=\lo/8,\qquad H=\hi/4 .
+\]
+Thus $f(a)\in\{0,\pm1,\pm2,\pm3\}$, $H$ is odd with $|H|\le7$, and Fourier inversion gives
+\begin{equation}\label{eq:fhat}
+  \widehat f = 64\,V\in\{0,\pm64\}.
+\end{equation}
+
+\paragraph{Low side.} $Z=\{a:f(a)\text{ even}\}$ and $F=\{a:f(a)\text{ odd}\}$. The \emph{zeros} are $Z_0=\{f=0\}\subseteq Z$; since $F$ is balanced, $f(0)=0$, so $0\in Z_0$. The \emph{small masks} are $S_8=\{|f|=1\}\subseteq F$. Put $n_0=|Z_0|$, $n_8=|S_8|$ and $v=\bigoplus_{u\in S_8}u$.
+
+\paragraph{High side.} $A,C,B$ are the sets where $|H|=1,3,5$, of sizes $a,c,b$; $k=a+c$. The phase is $q=(-1)^{(H-1)/2}$, so that
+\begin{equation}\label{eq:qH}
+  qH=-7+8\cdot\ind_A+12\cdot\ind_B+4\cdot\ind_C .
+\end{equation}
+
+\paragraph{Facts used from~\main{}.}
+\begin{enumerate}[label=(F\arabic*),nosep]
+\item\label{F:mass} \emph{Mass identity:} $6a+3b+5c=8t-480=320$ (Parseval on $\hi$).
+\item\label{F:phase} \emph{Quadratic phase:} $q=(-1)^{\beta}$ with $\beta$ quadratic of polar rank $r\in\{0,2,4,6,8\}$, and $Z=\{\mathcal Q=0\}$ for a quadratic form $\mathcal Q$ with the same polar matrix. The possible $|Z|$ are $\{128,256\}$, $\{64,128,192\}$, $\{96,128,160\}$, $\{112,128,144\}$, $\{120,136\}$ for $r=0,\dots,8$.
+\item\label{F:budget} \emph{Defect budget:} $n_0+2n_8=(2304-5|Z|-16t)/4=(704-5|Z|)/4$ (Parseval on $\lo$).
+\item\label{F:parity} \emph{Parity law:} $r=8$ if and only if $k$ is odd.
+\end{enumerate}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}cccl@{}}
+\toprule
+rank $r$ & $|Z|$ & budget $n_0+2n_8$ & where it is closed\\
+\midrule
+$0,2,4$ & all & -- & hand proof, Section~\ref{sec:low}\\
+$6$ & $144$ & $-4$ & impossible (negative budget)\\
+$6$ & $128$ & $16$ & hand reductions + verified search, Section~\ref{sec:r6}\\
+$6$ & $112$ & $36$ & hand reductions + audited search, Section~\ref{sec:r6}\\
+$8$ & $136$ & $6$ & hand proof, Corollary~\ref{cor:136}\\
+$8$ & $120$ & $26$ & lemmas by hand, enumeration by computer, Section~\ref{sec:r8}\\
+\bottomrule
+\end{tabular}
+\caption{The cases at $t=100$.}
+\label{tab:cases}
+\end{table}
+
+% ===========================================================================
+\section{Ranks $0$, $2$ and $4$}\label{sec:low}
+% ===========================================================================
+
+\begin{proposition}\label{prop:low}
+At $t=100$ the phase has rank $6$ or $8$.
+\end{proposition}
+
+\begin{proof}
+A quadratic sign of polar rank $r$ on $\F_2^8$ has Walsh transform supported on an affine flat $R$ of $2^r$ points, where it equals $2^{8-r/2}\sigma$ for a sign $\sigma:R\to\{\pm1\}$. Since $H=\widehat U/2$,
+\[
+  \sum_\omega q(\omega)H(\omega)=\tfrac12\sum_x U(x)\,\widehat q(x)=2^{7-r/2}\sum_{x\in R}U(x)\sigma(x).
+\]
+By~\eqref{eq:qH} the left side is $-1792+8a+12b+4c$. Eliminating $b$ with~\ref{F:mass} gives $8a+12b+4c=1280-16k$, so
+\[
+  \sum_{x\in R}U(x)\sigma(x)=-\frac{(k+32)\,2^{r/2}}{8}.
+\]
+The left side is at least $-|R|=-2^r$, because $U$ is ternary. Hence $k\le 8\cdot2^{r/2}-32$, that is $k\le-24$, $k\le-16$ and $k\le0$ for $r=0,2,4$. The first two are impossible. For $r=4$ we get $k=0$, so $a=c=0$ and~\ref{F:mass} reads $3b=320$, which has no integer solution.
+\end{proof}
+
+\begin{remark}
+The same identity at general $t$ reads $\sum_R U\sigma=(t-116-k/2)\,2^{r/2}/4$, the form used at $t=104$ in the packet. At $t=100$ it removes three ranks at once, with no search. The main paper records these ranks as closed by a certificate search over high-block profiles (``$0$ open systems''); the argument above makes that search unnecessary.
+\end{remark}
+
+% ===========================================================================
+\section{Rank $8$}\label{sec:r8}
+% ===========================================================================
+
+At rank $8$, $|Z|\in\{120,136\}$. Choose coordinates in which $\mathcal Q$ is
+\[
+  Q_8^-(u)=u_0+u_1+u_0u_1+u_2u_3+u_4u_5+u_6u_7,
+\]
+the elliptic form, with $|Z|=120$ and $|F|=136$ (for $|Z|=136$ use the hyperbolic form). Let $B$ be the polar matrix of $\mathcal Q$; it is invertible.
+
+\subsection{Two kinds of hyperplane}
+
+For $y\ne0$ write $N_Z(y)=\#\{a\in Z:a\cdot y=1\}$.
+
+\begin{lemma}\label{lem:hyper}
+Let $|Z|=120$. There is a quadratic form $\mathcal Q^*$ with polar matrix $B^{-1}$ and $\mathcal Q^*(0)=0$ such that $N_Z(y)=60+4(-1)^{\mathcal Q^*(y)}$ for $y\neq0$. So every linear hyperplane meets $Z$ in $64$ points (type $H_{64}$, where $\mathcal Q^*(y)=0$) or $56$ points (type $H_{56}$), and $\mathcal Q^*$ has $120$ zeros: $119$ hyperplanes are of type $H_{64}$ and $136$ of type $H_{56}$.
+\end{lemma}
+
+\begin{proof}
+For a nondegenerate form, $\sum_a(-1)^{\mathcal Q(a)+a\cdot y}=\pm16\,(-1)^{\mathcal Q(B^{-1}y)}$; completing the square shows the exponent is a quadratic form in $y$ with polar matrix $B^{-1}B\,B^{-1}=B^{-1}$. Since $\ind_Z=(1+(-1)^{\mathcal Q})/2$, we get $\sum_{a\in Z}(-1)^{a\cdot y}=-8(-1)^{\mathcal Q^*(y)}$ for $y\ne0$, where the sign convention $\mathcal Q^*(0)=0$ and the value $|Z|=128-8$ at $y=0$ fix the overall sign as $-$. Then $N_Z(y)=(|Z|-\sum_Z(-1)^{a\cdot y})/2$. Counting incidences, $\sum_{y\ne0}N_Z(y)=128\cdot119$, which forces $\sum_y(-1)^{\mathcal Q^*(y)}=-16$, i.e.\ $120$ zeros.
+\end{proof}
+
+\subsection{The mod-$4$ law}
+
+For $y\ne0$ let $w(y)=\#\{a\in Z_0:a\cdot y=1\}$.
+
+\begin{lemma}[mod-$4$ hyperplane law]\label{lem:mod4}
+For every $y\ne0$, $w(y)\equiv 2\big(\mathcal Q^*(y)+v\cdot y\big)\pmod 4$.
+\end{lemma}
+
+\begin{proof}
+Since $f^2=\widehat V^2/16$, Fourier inversion gives $\sum_a f(a)^2(-1)^{a\cdot y}=16\,C_V(y)$, where $C_V(y)=\sum_xV(x)V(x+y)$. Its terms come in equal pairs $\{x,x+y\}$, so $C_V(y)$ is even. With $\sum f^2=16t$ and $t$ even,
+\[
+  \sum_{a\cdot y=1}f(a)^2 = 8\big(t-C_V(y)\big)\equiv 0\pmod{16}.
+\]
+On the other hand $f^2$ is $0,4,1,9$ on $Z_0$, $Z\setminus Z_0$, $S_8$, $F\setminus S_8$. Writing $N_F(y)=128-N_Z(y)$ and $s(y)=\#\{u\in S_8:u\cdot y=1\}\equiv v\cdot y\pmod 2$,
+\[
+  \sum_{a\cdot y=1}f(a)^2=4\big(N_Z-w\big)+s+9\big(N_F-s\big)\equiv 512+5N_F-4w-8\,v\cdot y\pmod{16}.
+\]
+By Lemma~\ref{lem:hyper}, $5N_F\equiv 8\,\mathcal Q^*(y)\pmod{16}$ ($N_F=64$ or $72$). Hence $4w\equiv 8(\mathcal Q^*(y)+v\cdot y)\pmod{16}$.
+\end{proof}
+
+\subsection{The zeros decide everything}
+
+Let $G(y,y')=\sum_{a\in Z_0}(a\cdot y)(a\cdot y')\bmod 2$, the Gram form of the incidence code of $Z_0$.
+
+\begin{proposition}\label{prop:zeros}
+At rank $8$ with $|Z|=120$:
+\begin{enumerate}[label=(\alph*),nosep]
+\item $G=B^{-1}$; in particular $G$ is nondegenerate.
+\item $Z_0$ spans $\F_2^8$ and $\bigoplus_{a\in Z_0}a=0$.
+\item $n_0$ is even and $n_0\ge10$.
+\item $\mathcal Q$, hence $Z$, is determined by $Z_0$; and $v$ is determined by $Z_0$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+All $w(y)$ are even by Lemma~\ref{lem:mod4}, so $y\cdot\bigoplus_{Z_0}a=0$ for all $y$, which is the XOR claim. Put $\varphi(y)=w(y)/2\bmod 2$. From $w(y+y')=w(y)+w(y')-2\sum_{Z_0}(a\cdot y)(a\cdot y')$ we get $\varphi(y+y')+\varphi(y)+\varphi(y')=G(y,y')$, so $G$ is the polar form of $\varphi$. By Lemma~\ref{lem:mod4}, $\varphi=\mathcal Q^*+v\cdot y$, whose polar form is that of $\mathcal Q^*$, namely $B^{-1}$. This is (a). If $Z_0$ lay in a hyperplane $\{a\cdot y=0\}$, $y\ne0$, then $G(y,\cdot)=0$, contradicting (a). Since $0\in Z_0$, the other $n_0-1$ zeros span $\F_2^8$, so $n_0\ge9$. The budget gives $n_0=26-2n_8$, which is even; this proves (c). For (d): $B=G^{-1}$ fixes the quadratic part of $\mathcal Q$, and the linear part is then fixed by $\mathcal Q=0$ on a basis contained in $Z_0$. Finally $v\cdot y=\varphi(y)+\mathcal Q^*(y)$ determines $v$.
+\end{proof}
+
+\begin{remark}[coding view]
+List the nonzero zeros as columns of an $8\times(n_0-1)$ matrix. Its row space $C$ is an even binary code with $C\cap C^\perp=0$, by (a): an \emph{LCD code}~\cite{Massey}. Its dual is an $[n_0-1,\,n_0-9]$ LCD code that contains the all-ones word, and it has minimum distance at least $3$ because the zeros are distinct and nonzero. The packets enumerate such codes for small $n_0$.
+\end{remark}
+
+\begin{corollary}\label{cor:136}
+Rank $8$ with $|Z|=136$ is impossible at $t=100$.
+\end{corollary}
+
+\begin{proof}
+The budget is $(704-680)/4=6$, so $n_0\le6$. The argument of Proposition~\ref{prop:zeros}(b,c) applies verbatim with the hyperbolic form and gives $n_0\ge9$.
+\end{proof}
+
+\begin{proposition}\label{prop:n10}
+At rank $8$, $|Z|=120$, the case $n_0=10$ is impossible.
+\end{proposition}
+
+\begin{proof}
+The nine nonzero zeros span $\F_2^8$ and have XOR zero, so in suitable coordinates they are $e_1,\dots,e_8$ and $e_1+\dots+e_8$. In the dual coordinates $G(y,y')=y\cdot y'+(\ind\cdot y)(\ind\cdot y')$, i.e.\ $G=I+J$. As $(I+J)^2=I+2J+8J\equiv I$, we get $B=G^{-1}=I+J$. The form $\sum_{i<j}x_ix_j$ has this polar matrix and vanishes at every $e_i$, so by Proposition~\ref{prop:zeros}(d), $\mathcal Q(x)=\binom{\wt(x)}{2}\bmod2$. It vanishes exactly when $\wt(x)\equiv0,1\pmod4$, at $1+8+70+56+1=136$ points. This contradicts $|Z|=120$, whatever $v$ is.
+\end{proof}
+
+\begin{remark}
+The packet's check for $n_0=10$ computes the zero count of $\varphi$ only, which is the case $v=0$; this is enough at $t\ge102$ but not obviously at $t=100$, where $n_8=8$ and $v$ may be nonzero. Proposition~\ref{prop:zeros}(d) closes the gap: $\mathcal Q$ does not depend on $v$.
+\end{remark}
+
+\subsection{Three exact reductions for larger $n_0$}
+
+From now on $n_0\in\{12,14,\dots,26\}$ and $n_8=(26-n_0)/2$. Given a candidate zero set $Z_0$ (and hence $Z$ and $v$), three facts reduce the search for $V$ to finite linear algebra.
+
+\begin{lemma}[the digit system]\label{lem:digits}
+For every $I\subseteq\{0,\dots,7\}$, $M_I:=\sum_u f(u)\,u^I\equiv0\pmod{2^{6-|I|}}$, where $u^I=\prod_{i\in I}u_i$.
+\end{lemma}
+
+\begin{proof}
+Expanding $(-1)^{u\cdot x}=\prod_i(1-2u_ix_i)$ gives $\widehat f(x)=\sum_I(-2)^{|I|}M_I\,x^I$, so $(-2)^{|I|}M_I$ is the M\"obius inverse $\sum_{J\subseteq I}(-1)^{|I\setminus J|}\widehat f(\ind_J)$. By~\eqref{eq:fhat} the right side is divisible by $64$.
+\end{proof}
+
+\begin{lemma}[the phase on $F$]\label{lem:phase}
+On $F$ write $f\equiv1-2g\pmod4$ with $g:F\to\F_2$. Then $g$ is determined by $Z_0$ up to adding an affine function. Adding $a\cdot x_0$ translates $V$ and adding $1$ negates it, so up to these symmetries $f$ is determined on $F$ by $Z_0$ and $S_8$.
+\end{lemma}
+
+\begin{proof}
+Reduce Lemma~\ref{lem:digits} modulo $4$ for $|I|\le4$. As $f\equiv0,2,1-2g$ on $Z_0$, $Z\setminus Z_0$, $F$,
+\[
+  2\sum_{F}g\,u^I\equiv 2\sum_{Z\setminus Z_0}u^I+\sum_F u^I\pmod 4 .
+\]
+One checks that $\sum_Fu^I$ is even for $|I|\le4$, so this is a linear system for $g$ over $\F_2$, with right side fixed by $Z_0$. Two solutions differ by $h$ with $h\ind_F\in\RM(4,8)^\perp=\RM(3,8)$, i.e.\ by an element of $\RM(3,8)$ vanishing on $Z$. The restriction $\RM(3,8)\to\F_2^{Z}$ has rank $84$ (computed: $93$ monomials, $120$ points), so this kernel has dimension $9$; it contains the $9$-dimensional space $\mathcal Q\cdot\RM(1,8)$, hence equals it. On $F$, $\mathcal Q\cdot\ell=\ell$. Finally, once $g$ is known, $f$ on $F$ is determined by $|f|$: $f=3$ or $-1$ when $g=1$, and $f=-3$ or $1$ when $g=0$.
+\end{proof}
+
+\begin{lemma}[top-$100$ bound]\label{lem:top}
+Let $w_F=\widehat{f\ind_F}$. The sum of the $100$ largest values of $|w_F|$ is at least $4(1224-8n_8)$.
+\end{lemma}
+
+\begin{proof}
+By Parseval and~\eqref{eq:fhat}, $64\sum_xV(x)w_F(x)=\sum_x\widehat f(x)w_F(x)=256\sum_Ff^2=256(n_8+9(136-n_8))$. The left side is at most $64$ times the sum of the $100$ largest $|w_F|$, as $V$ is a $\pm1$ vector on $100$ points.
+\end{proof}
+
+\begin{lemma}[the $y_Z$ system]\label{lem:yz}
+On $Z\setminus Z_0$ write $f=2-4y_Z$ with $y_Z\in\{0,1\}$. Then $y_Z$ satisfies the $93$ linear equations $\sum_{u\in Z\setminus Z_0}y_Z(u)\,u^I\equiv \tfrac14\sum_u f_{\mathrm{base}}(u)u^I\pmod2$, $|I|\le3$, where $f_{\mathrm{base}}$ is $f$ with $y_Z=0$.
+\end{lemma}
+
+\begin{proof}
+Lemma~\ref{lem:digits} with $|I|\le3$ gives $M_I\equiv0\pmod8$, and $M_I=\sum f_{\mathrm{base}}u^I-4\sum y_Zu^I$.
+\end{proof}
+
+For $n_0\ge22$, and for the $\mathrm{QR}(17)$ case of Section~\ref{sec:qr17}, the computer then: builds $f$ on $F$ (Lemma~\ref{lem:phase}); discards it if the top-$100$ bound fails (Lemma~\ref{lem:top}); otherwise solves the $y_Z$ system, whose solution space has dimension at most $15$ in every case met, and tests each solution by a full transform, asking whether $\widehat f/64$ is a ternary vector of weight $100$. A real $V$ is reported as \code{REAL\_V}.
+
+\subsection{Finding the zero sets}
+
+The candidates $Z_0$ are produced by search, using three restrictions.
+\begin{itemize}[nosep]
+\item \emph{Smallest hyperplane.} Let $d_{\mathrm{aff}}$ be the least number of zeros on one side of an affine hyperplane. Translating $V$ by a character moves any zero to the origin, so the minimum may be taken over linear hyperplanes, of type $H_{64}$ or $H_{56}$. The parity of $w$ on each type is fixed by Lemma~\ref{lem:mod4}.
+\item \emph{$H_{64}$ needs at least $6$.} On an $H_{64}$ hyperplane, $\RM(3,7)$ restricted to its $64$ zeros of $\mathcal Q$ has rank $56$, so the phase there is again unique. Exhaustion shows that no $2$-set and only $5{,}376$ $4$-sets (two orbits) pass, and exact LP duals show both orbits need $n_8\ge8$; so for $n_8\le7$ an $H_{64}$ hyperplane carries at least $6$ zeros (\code{verify\_h64\_w\_ge\_6\_exact.py}).
+\item \emph{Delsarte bounds.} Signed Krawtchouk inequalities, weighted by $\mathcal Q^*$ and $v$, give $11$ exact rational Farkas certificates bounding $d_{\mathrm{aff}}$ for each $n_0$ (\code{verify\_delsarte\_farkas\_exact.py}; method of~\cite{Delsarte}).
+\end{itemize}
+The surviving hyperplane configurations are listed exactly (orbit tables in \code{t100/r8/}) and extended by depth-first search to all valid $Z_0$, reduced modulo the orthogonal group $O^-(8,2)$ of $Q_8^-$ by explicit, checked isomorphisms.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}c c p{8.2cm} >{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+$n_0$ & $n_8$ & what kills it & verifier\\
+\midrule
+$\le8$ & -- & Proposition~\ref{prop:zeros}(c) & by hand\\
+$10$ & $8$ & Proposition~\ref{prop:n10} & by hand\\
+$12$ & $7$ & one geometry with $|Z|=120$; an integer functional forces $n_8\ge51$ & \code{verify\_t102\_r8\_closed.cpp}\\
+$14$ & $6$ & $472$ LCD codes, $32$ survive; each has an integer dual witness & \code{audit\_n14\_n16\_exact.cpp}\\
+$16$ & $5$ & $5{,}185{,}911$ codes, $4{,}124$ classes; each has an integer dual witness & \code{audit\_n14\_n16\_exact.cpp}\\
+$18$ & $4$ & $v=0$: the zeros are the $\mathrm{QR}(17)$ geometry; all $53{,}550$ choices of $S_8$ fail (Section~\ref{sec:qr17}). $v\ne0$: $912$ codes, $5$ orbits, exact $L_1$ duals & \code{verify\_qr17\_t100\_ standalone.cpp}, \code{audit\_n18\_n20\_ exact\_orbits.cpp}\\
+$20$ & $3$ & $109{,}846$ codes, $342$ orbits; $224$ Farkas, $118$ $L_1$ duals & same, \code{certify\_exact\_ o8\_orbs\_L1.py}\\
+$22$ & $2$ & $1{,}267{,}047$ codes, $8{,}655$ orbits, $311{,}580$ pairs $S_8$; $939$ orbits fail the top-$100$ bound, the rest the $y_Z$ system & \code{solve\_n22\_o8\_ exact.cpp}\\
+$24$ & $1$ & $12{,}318{,}368$ codes; $2{,}688{,}263$ fail the top-$100$ bound, the rest the $y_Z$ system & \code{solve\_n24\_exact.cpp}\\
+$26$ & $0$ & $1{,}413{,}762$ codes; top-$100$ bound and $2^{10}$ $y_Z$ candidates & \code{solve\_n26\_v0\_ turbo.cpp}, \code{exact\_H64\_w8\_ and\_n26\_d8.cpp}\\
+\bottomrule
+\end{tabular}
+\caption{Rank $8$, $|Z|=120$ at $t=100$. Every computed row has \code{REAL\_V}~$=0$.}
+\label{tab:r8}
+\end{table}
+
+\paragraph{Positive controls.} The engines are pointed at $t=102$, where a real low block exists, and must find it: the two $n_0=26$ engines recover all $12$ copies of the $\mathrm{QR}(17)$ block on one hyperplane class and all $4$ on another; the $L_1$ certifier gives exactly $64\cdot102$ there and does not kill it; the Delsarte script confirms the corresponding system is feasible. Orbit reductions are checked by summing orbit sizes against unreduced counts ($16{,}128=16{,}128$ in one test).
+
+\subsection{The $\mathrm{QR}(17)$ near miss}\label{sec:qr17}
+
+At $n_0=18$ with $v=0$ the incidence code $C$ of the nonzero zeros is an even $[17,8]$ code. Its minimum distance $d$ is even, and the Griesmer bound rules out $d\ge8$ ($8+4+2+1+1+1+1+1=19>17$). Searches with $d=2$ and $d=4$ find nothing; $d=6$ gives exactly $12$ solutions, forming one orbit, and $C$ is the even-weight subcode of the binary quadratic-residue code of length $17$: a $[17,8,6]$ code whose dual is $\mathrm{QR}(17)$, a $[17,9,5]$ code~\cite{MS} (\code{verify\_t102\_r8\_closed.cpp}).
+
+At $t=102$ the budget is $18$, so $n_8=0$, and this geometry carries a genuine low block $V$, unique up to symmetry. It is a real near-solution: only the coupling to the high block kills it, across all $512$ admissible high-block phases (\code{verify\_t102\_r8\_closed.cpp}).
+
+At $t=100$ the budget is $26$, so $n_8=4$; and $v=0$ forces the four small masks to have XOR zero. There are $53{,}550$ such $4$-sets in $F$. For $53{,}142$ of them the top-$100$ bound fails. The other $408$ meet it with equality, and equality pins $V$ down completely (it must be the sign of $w_F$ on the $100$ largest entries); each of those $408$ forced tables fails to be a valid low block (\code{verify\_qr17\_t100\_standalone.cpp}, which also recovers the real $t=102$ block as a control). So the geometry that nearly works one step up does not survive on the low side here.
+
+% ===========================================================================
+\section{Rank $6$}\label{sec:r6}
+% ===========================================================================
+
+\subsection{Four cells}
+
+At rank~$6$ the common polar form of $\beta$ and $\mathcal Q$ has a $2$-dimensional radical $W\subset\F_2^8$. Choose coordinates $(w,c)\in\F_2^2\times\F_2^6$ with $W=\F_2^2\times\{0\}$ and put
+\[
+  q_6(c)=c_0c_1+c_2c_3+c_4c_5,\qquad Q_6(c)=(-1)^{q_6(c)},
+\]
+the hyperbolic form on $\F_2^6$ ($36$ zeros, $28$ ones; polar matrix $J$ swapping $c_{2i}\leftrightarrow c_{2i+1}$). A \emph{group} is a coset $c+W$, indexed by $c\in\F_2^6$. Dually, input space splits into four \emph{cells} of $64$ points, indexed by $x\in\F_2^2$. Write $v_x,u_x:\F_2^6\to\{-1,0,1\}$ for $V,U$ on cell $x$, and $z_x=\widehat{v_x}$, $U_x=\widehat{u_x}$ for their $64$-point Walsh transforms. Then
+\[
+  \widehat V(w,c)=4f(w,c)=\sum_{x\in\F_2^2}(-1)^{w\cdot x}z_x(c),\qquad
+  \widehat U(w,c)=2H(w,c)=\sum_{x\in\F_2^2}(-1)^{w\cdot x}U_x(c),
+\]
+so Fourier inversion on $\F_2^2$ gives
+\[
+  z_x(c)=\sum_{w\in\F_2^2}(-1)^{w\cdot x}f(w,c),\qquad
+  U_x(c)=\tfrac12\sum_{w\in\F_2^2}(-1)^{w\cdot x}H(w,c),
+\]
+with Parseval identities $\sum_c z_x(c)^2=64\,\wt(v_x)$ and $\sum_x\wt(v_x)=100$. On a group $c+W$ the form $\mathcal Q$ is either constant or nonconstant affine:
+\begin{itemize}[nosep]
+\item $|Z|=112$ (or $144$, which has negative budget $-4$): $\mathcal Q(w,c)=1+q_6(c)$ after translating $c$; each group lies wholly in $Z$ ($28$ groups, $Q_6(c)=-1$, denoted $Z_6$) or wholly in $F$ ($36$ groups, $Q_6(c)=+1$, denoted $F_6$).
+\item $|Z|=128$: $\mathcal Q(w,c)=\ell(w)+q_6(c)$ with $\ell\neq0$. A linear change of $w$ sets $\ell(w)=w_0$, and replacing $w_0\mapsto w_0+\lambda(c)+\varepsilon$ absorbs any affine term from $q_6$, giving the normal form $\mathcal Q(w_0,w_1,c)=w_0+q_6(c)$. Every group has two points in $Z$ ($w_0=q_6(c)$) and two in $F$ ($w_0=1+q_6(c)$). Moreover, every $g\in\mathrm{AffSp}(6,2)$ satisfies $q_6(g(c))=q_6(c)+\lambda_g(c)+\varepsilon_g$ for an affine $\lambda_g+\varepsilon_g$; pairing $g$ with $w_0\mapsto w_0+\lambda_g(c)+\varepsilon_g$ preserves $\mathcal Q$, acts on $z_{00},z_{01}$ by $c\mapsto g(c)$, and multiplies $z_{10},z_{11}$ by $(-1)^{\varepsilon_g}$. Thus the full group $\mathrm{AffSp}(6,2)$ is an exact symmetry. Furthermore, the invertible linear shear $(x_0,x_1,y)\mapsto(x_0+x_1,x_1,y)$ on $\F_2^8$ (with frequency-space dual $(w_0,w_1,c)\mapsto(w_0,w_0+w_1,c)$) is an exact global symmetry that fixes $\mathcal Q(w_0,w_1,c)=w_0+q_6(c)$, $c$, $v_{00}$, $v_{10}$, $L_{00}$, $L_{01}$ and $(d_c,k_c)$ pointwise while exchanging $v_{01}\leftrightarrow v_{11}$ (and hence $z_{01}\leftrightarrow z_{11}$ and $p_{01}\leftrightarrow p_{11}$).
+\end{itemize}
+
+\subsection{$|Z|=128$, budget $16$}\label{sec:z128}
+
+For each group $c\in\F_2^6$, let $d_c\in\{0,1,2\}$ be the number of zeros ($f=0$) in group $c$, $k_c\in\{0,1,2\}$ the number of small masks ($|f|=1$), and $u(c)=d_c\bmod2$. Put $s_Z(c)=0$ if $d_c\in\{0,2\}$ and $s_Z(c)=\pm1$ (the sign of the indicator difference between the two $Z$-points) if $d_c=1$; define $s_F(c)\in\{0,\pm1\}$ analogously from the two $F$-points. The defect budget is $\sum_c(d_c+2k_c)=16$.
+
+\begin{lemma}[parity, mod-$8$ and autocorrelation laws]\label{lem:z128-laws}
+At $|Z|=128$:
+\begin{enumerate}[label=(\alph*),nosep]
+\item Every $z_x(c)$ is even, $L_x:=(z_x/2)\bmod2\in\RM(1,6)$, and $p_x:=((z_x-2L_x)/4)\bmod2\in\RM(2,6)$.
+\item $L_{00}=L_{10}=1+L_{01}=1+L_{11}$, and
+\[
+  p_{00}+p_{10}=u+L_{00}(1+q_6),\qquad p_{01}+p_{11}=u+L_{01}(1+q_6).
+\]
+\item For all $y\in\F_2^6$ (with $y\neq0$ in the first congruence),
+\begin{align*}
+  \widehat{d+2k}(y)&\equiv0\pmod 8, &
+  \widehat{Q_6(d-2k)}(y)&\equiv4\pmod 8,\\
+  \widehat{s_Z+2s_F}(y)&\equiv0\pmod 8, &
+  \widehat{Q_6(s_Z-2s_F)}(y)&\equiv0\pmod 8.
+\end{align*}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Each group has two odd $f$-values (in $F$) and two even ones (in $Z$), so each $z_x(c)$ is even. Applying Lemma~\ref{lem:digits} on $\F_2^6$ to $v_x$ modulo $4$ ($|I|\le4$) and modulo $8$ ($|I|\le3$) yields $L_x\in\RM(1,6)$ and $p_x\in\RM(2,6)$. Part~(b) is a local identity on each group $c$, checked over all $2\cdot3^2\cdot4^2=288$ choices of $(q_6(c),f(\cdot,c))$. For~(c), Fourier inversion on $f^2=\widehat V^2/16$ gives $\widehat{f^2}(y_0,y_1,y)=16\,C_V(y_0,y_1,y)$, divisible by $32$ for $(y_0,y_1,y)\neq0$ since $C_V$ is even. On group $c$, $f^2$ is $4-4\ind_{f=0}$ on the two $Z$-points (sum $8-4d_c$, difference $-4s_Z$) and $9-8\ind_{|f|=1}$ on the two $F$-points (sum $18-8k_c$, difference $-8s_F$). Evaluating at the four $(y_0,y_1)\in\F_2^2$ with $\widehat{Q_6}=8\,Q_6$ ($-10\cdot8\equiv16\pmod{32}$) gives the four congruences.
+\end{proof}
+
+Swapping $w_1$ exchanges $L_{00}\leftrightarrow L_{01}$, and $\mathrm{AffSp}(6,2)$ acts transitively on all $126$ affine hyperplanes of $\F_2^6$. Thus every configuration lies in one of two top branches: \textbf{Branch~I} ($L_{00}=\ind_H$, $H=\{c_0=1\}$) or \textbf{Branch~II} ($L_{00}=0$, $L_{01}=1$).
+
+\paragraph{Branch~I ($L_{00}=\ind_H$, $H=\{c_0=1\}$).}
+By Lemma~\ref{lem:z128-laws}(b), $u\in\ind_Hq_6+\RM(2,6)$ with $\wt(u)\le16$. Exhaustive enumeration of this coset shows minimum weight $12$: there are $32$ words of weight $12$, $0$ of weight $14$, and $384$ of weight $16$ ($416$ in all). Filtering by Lemma~\ref{lem:z128-laws}(c) leaves $320$ configurations of weight~$16$ (all with $d_c=u(c)$, $k_c=0$) and $1{,}152$ of weight~$12$ (none with any $k_c=2$). The literal stabilizer $G_{\mathrm{lit}}\le\mathrm{AffSp}(6,2)$ fixing both $H$ and $q_6$ has order $23{,}040$ and partitions these survivors into exactly $2$ weight-$16$ orbits and $9$ weight-$12$ orbits, matching all $11$ hard-coded representatives in \code{t100/z128/} (\code{verify\_z128\_reductions.cpp}).
+
+\begin{lemma}[weight-$16$ normalization and syndrome]\label{lem:wt16}
+In the two weight-$16$ orbits of Branch~I, every admissible configuration is equivalent to one with $p_{00}|_H=p_{00}|_{H^c}$, and satisfies both the $p_{01}|_H$ half-completion condition and the $22$-bit degree-$4$--$6$ syndrome identity checked by \code{solve\_branchI\_wt16\_fast}.
+\end{lemma}
+
+\begin{proof}
+Because $z_{00}\equiv0\pmod 4$ on $H^c$ and $z_{00}\equiv2\pmod 4$ on $H$, we have $z_{00}(c)-2c_0\equiv4p_{00}(c)\pmod 8$ for all $c\in\F_2^6$. Any third-order difference $\Delta_{d_1}\Delta_{d_2}\Delta_{d_3}$ satisfies $\Delta_{d_1}\Delta_{d_2}\Delta_{d_3}z_{00}\equiv0\pmod 8$ (by Walsh inversion) and $\Delta_{d_1}\Delta_{d_2}\Delta_{d_3}(2c_0)\equiv0\pmod 8$ (as an integer it takes values in $\{0,\pm8\}$); dividing by $4$ gives $\Delta^3 p_{00}\equiv0\pmod 2$, so $p_{00}\in\RM(2,6)$. Hence $p_{00}(1,c')+p_{00}(0,c')=s+y'\cdot c'$ is affine in $c'\in\F_2^5$ for some $s\in\F_2, y'\in\F_2^5$.
+
+Now apply the exact global symmetry $v'_{ab}(y)=(-1)^s v_{ab}(y+(0,y'))$ simultaneously to all four cells $(v_{00},v_{10},v_{01},v_{11})$. This multiplies every Walsh coefficient $\widehat V(w,c)$ and every $z_x(c)$ by $(-1)^{s+y'\cdot c'}$ (independent of $c_0$), preserving all magnitudes $|\widehat V|$, $q_6$, $L_{00}=\ind_H$, and $(d_c,k_c)$ identically:
+\begin{itemize}[nosep]
+  \item on $H^c$, $z_{00}\equiv0\pmod 4$, so negating $z_{00}$ leaves $(z_{00}/4)\bmod2$ unchanged ($p'_{00}|_{H^c}=p_{00}|_{H^c}$);
+  \item on $H$, $z_{00}\equiv2\pmod 4$, so negating $z_{00}$ flips $((z_{00}-2)/4)\bmod2$, yielding $p'_{00}|_H=p_{00}|_H+(s+y'\cdot c')=p_{00}|_{H^c}=p'_{00}|_{H^c}$;
+  \item on $H$, $z_{01}\equiv0\pmod 4$, so negating $z_{01}$ leaves $p_{01}|_H$ unchanged ($p'_{01}|_H=p_{01}|_H$).
+\end{itemize}
+Thus every admissible configuration has a representative with $p'_{00}|_H=p'_{00}|_{H^c}$, and its companion pair $(v'_{01},v'_{11})$ must admit a valid $L_0$-half on $H$ for $p'_{01}|_H$ (\code{has\_L0\_any}).
+
+For the $22$-bit syndrome, put $A(c):=z_{00}(c)+z_{10}(c)=\widehat{v_{00}+v_{10}}(c)$. For every mask $m\in\F_2^6$ of weight $r\in\{4,5,6\}$ ($\binom64+\binom65+\binom66=22$ masks),
+\[
+  \sum_{c\subseteq m}A(c)=2^r\sum_{y:\,y_i=0\,\forall i\in m}\big(v_{00}(y)+v_{10}(y)\big)\equiv0\pmod{16},
+\]
+since $16\mid 2^r$. Exhaustive verification over all admissible local tuples with $k_c=0$ and $d_c\in\{0,1\}$ gives the exact pointwise congruence
+\[
+  A(c)\equiv A_{\mathrm{base}}[c]+8\Big((M_{\mathrm{self}}[c]\wedge p_{00}(c))\oplus(M_{\mathrm{other}}[c]\wedge p_{01}(c))\oplus s_A(c)\Big)\pmod{16},
+\]
+where $s_A(c)=\ind[(A(c)-4)\bmod16=8]$ on the $8$ defect sites $H^c\cap U$ and $0$ elsewhere. Summing over $c\subseteq m$ modulo $16$ forces $\mathrm{syn}_{\mathrm{base}}\oplus\mathrm{syn}_{\mathrm{self}}\oplus\mathrm{syn}_{\mathrm{other}}\oplus\mathrm{syn}_{s_A}=0$ on all $22$ masks. Whereas the general solver \code{solve\_branchI\_rest} leaves $589{,}824$ uncoupled joins per orbit (taking the union over all $256$ masks $s_A$ without coupling each $L_0$-half's realized $s_A$ to $p_{01}|_H$ or checking \code{has\_L0\_any}), enforcing these exact necessary conditions in \code{solve\_branchI\_wt16\_fast} yields $0$ joins in $1.4\,\mathrm{s}$ per orbit.
+\end{proof}
+
+\paragraph{Branch~II-A ($L_{00}=0$, $L_{01}=1$, $u\neq0$).}
+Here Lemma~\ref{lem:z128-laws}(b) reads $u=p_{00}+p_{10}\in\RM(2,6)\setminus\{0\}$ with $\wt(u)\le16$. By the Kasami--Tokura classification of low-weight words in $\RM(2,6)$, every nonzero word of weight $\le16$ has weight $16$ and is the indicator $\ind_W$ of an affine $4$-flat $W\subset\F_2^6$ (forcing $d_c=u(c)$ and $k_c=0$). Of the $2{,}604$ affine $4$-flats in $\F_2^6$, $1{,}260$ are degenerate for the symplectic form of $q_6$ and have $\widehat{Q_6\ind_W}\in\{0,\pm8\}\not\equiv4\pmod 8$, violating Lemma~\ref{lem:z128-laws}(c). The remaining $1{,}344$ are symplectic ($|\widehat{Q_6\ind_W}|\equiv4$) and form a single $\mathrm{AffSp}(6,2)$-orbit $W=\{c_4=c_5=0\}$, closed by \code{solve\_branchIIA}.
+
+\paragraph{Branch~II-B ($L_{00}=0$, $L_{01}=1$, $u\equiv0$).}
+Put $M=\{c:d_c=2\}$, $K_1=\{c:k_c=1\}$, $K_2=\{c:k_c=2\}$. Then $0\in M$ (since $f(0)=0$ and $u=0$), and the budget is
+\[
+  |M|+|K_1|+2|K_2|=8.
+\]
+
+\begin{lemma}[Branch~II-B mod-$16$ and Gram laws]\label{lem:IIB-mod16}
+In Branch~II-B:
+\begin{enumerate}[label=(\alph*),nosep]
+\item $p_{00}=\ind_{K_1}$ on $M$, $(f_{00}+f_{01})/4\equiv(1+q_6)p_{00}+\ind_{K_1}\pmod2$ has algebraic degree $\le3$, and
+\[
+  \deg\big(\ind_{M\triangle K_1}+Q_2+q_6p_{01}\big)\le3,
+\]
+where $Q_2(c)=c_0c_1c_2c_3+c_0c_1c_4c_5+c_2c_3c_4c_5$.
+\item $\bigoplus_{c\in M\triangle K_1}c=0$, and the Gram matrix $G(M\triangle K_1)=\sum_{c\in M\triangle K_1}cc^T\bmod2$ satisfies
+\[
+  G(M\triangle K_1)=J\big(B_{p_{01}}+(1+\tau)J\big)J,\qquad
+  \tau=(B_{p_{01}})_{01}+(B_{p_{01}})_{23}+(B_{p_{01}})_{45}\in\F_2.
+\]
+Hence $G(M\triangle K_1)\neq0$, its rank $r_G$ belongs to $\{r_0,r_1\}$ where $r_0=\rank(B_{p_{01}})$ and $r_1=\rank(B_{p_{11}})=\rank(B_{p_{01}}+J)$, and $r_G=2$ implies $\{r_0,r_1\}=\{2,4\}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Checking all local $4$-tuples with $L_{00}=0, u=0$ gives $p_{00}=\ind_{K_1}$ on $M$, $4\mid(f_{00}+f_{01})$ with $((f_{00}+f_{01})/4)\bmod2=(1+q_6)p_{00}+\ind_{K_1}$, and $2(f_{00}-f_{01})\equiv8+4q_6+8(q_6p_{01}+p_{00}+\ind_M+\ind_{K_1})\pmod{16}$. Since $2(f_{00}+f_{01})=z_{00}+z_{10}=\widehat{v_{00}+v_{10}}$ is divisible by $8$ and $2(f_{00}-f_{01})=z_{01}+z_{11}=\widehat{v_{01}+v_{11}}$, reducing Lemma~\ref{lem:digits} modulo $16$ ($|I|\le2$) on $\F_2^6$ and using $4q_6\equiv4(c_0c_1+c_2c_3+c_4c_5)+8Q_2\pmod{16}$ (where $4c_ic_j$ has transform divisible by $16$) yields both degree-$\le3$ claims in~(a). Equating the degree-$5$ and degree-$4$ ANF coefficients of $\ind_{M\triangle K_1}$ with $Q_2+q_6p_{01}$ gives $\bigoplus_{M\triangle K_1}=0$ and $G(M\triangle K_1)=J(B_{p_{01}}+(1+\tau)J)J$ (also checked on all $32{,}768$ quadratic forms $p_{01}\bmod\RM(1,6)$ in \code{verify\_z128\_reductions.cpp}). Since $B_{p_{01}}+(1+\tau)J$ has symplectic trace $1$, it is nonzero; its rank $r_G$ is $r_0$ when $\tau=1$ and $r_1$ when $\tau=0$. In particular, any rank-$2$ alternating matrix $M=uv^T+vu^T$ ($u,v\in\F_2^6$ linearly independent) has symplectic trace $\tau(M)=u^TJv=\omega(u,v)$. For the $315$ isotropic $2$-planes ($\omega(u,v)=0$), $\tau(M)=0$ and $\rank(M+J)=6$, so $G=J(M+(1+\tau)J)J=J(M+J)J$ has $r_G=6$, never $r_G=2$; only the $336$ hyperbolic $2$-planes ($\omega(u,v)=1$, $\tau(M)=1$) yield $r_G=2$, and on them $M+J$ drops rank to $4$, forcing $\{r_0,r_1\}=\{2,4\}$ (also confirmed across all $32{,}768$ forms in \code{verify\_z128\_reductions.cpp}).
+\end{proof}
+
+We now show that the case tree of Branch~II-B is complete and close II-B2 and II-B3 by hand. First, Lemma~\ref{lem:z128-laws}(c) with $s_Z=0$ gives $\widehat{s_F}\equiv0\pmod 4$, so $|K_1|$ is even, $\bigoplus_{K_1}=0$, and $|K_1|\neq2$. Combining $\bigoplus_{M\triangle K_1}=0$ (Lemma~\ref{lem:IIB-mod16}(b)) with $\bigoplus_{K_1}=0$ yields $\bigoplus_M=0$, so $|M|\neq2$; this kills $(|M|,|K_1|,|K_2|)=(2,4,1)$ and $(2,6,0)$. Because $0\in M$, only two subcases remain:
+
+\begin{itemize}[nosep]
+\item \textbf{Branch~II-B4 ($|M|=4$, $|K_1|=4$, $|K_2|=0$).} Since $|M|=4$, $0\in M$, and $\bigoplus_M=0$, $M$ is a linear $2$-plane; Lemma~\ref{lem:IIB-mod16} and non-vanishing of the symplectic trace fix $M$ as a symplectic $2$-plane (one $\mathrm{Sp}(6,2)$-orbit, $P=\{0,1,2,3\}$) and $K_1$ as an affine isotropic $2$-plane. All $5{,}040$ affine isotropic $2$-planes in $\F_2^6$ form exactly $10$ orbits under $\mathrm{Stab}_{\mathrm{AffSp}(6,2)}(P)$, matching the $10$ hard-coded representatives in \code{solve\_IIB4\_exact} (\code{verify\_z128\_reductions.cpp}).
+
+\item \textbf{Subcase $|K_1|=0$ ($|M|=8-2|K_2|\in\{4,6,8\}$).} We first show $p_{00}\equiv0$. By Lemma~\ref{lem:IIB-mod16}(a), $\deg((1+q_6)p_{00})\le3$, which forces $p_{00}\in\{0,q_6\}+\RM(1,6)$. Since $z_{00}=4p_{00}\in\{0,4\}$ when $L_{00}=0,u=0,K_1=\emptyset$, Parseval gives $64\,\wt(v_{00})=16\,|\{p_{00}=1\}|$, i.e.\ $4\,\wt(v_{00})=|\{p_{00}=1\}|$; as $\wt(v_{00})$ is even ($\widehat{v_{00}}(0)=0$), $8\mid|\{p_{00}=1\}|$, ruling out sizes $28$ and $36$, while $0\in M\implies p_{00}(0)=0$ rules out $64$. If $p_{00}=\ind_H$ ($32$ points), then on $H$ we have $|z_{01}|=|z_{11}|=6$ outside $H\cap K_2$; this forces both $\rank(p_{01}|_H)=\rank(p_{11}|_H)=4$ (otherwise the signed sum on $H$ gives a transform entry $\ge6\cdot16-16=80>64$) and $|H\cap K_2|\ge2$ (a single $\pm8$ cannot cancel $-6(\pm8)\equiv16\pmod{32}$), so $|K_2|=2$, $|M|=4$, $r_G=2$, and hence $\min(r_0,r_1)=2$, contradicting $\min(r_0,r_1)\ge4$. Thus $p_{00}\equiv0$ and $v_{00}=v_{10}=0$.
+\end{itemize}
+
+\begin{lemma}[zero-set rank bound]\label{lem:zsr}
+Let $v:\F_2^6\to\{-1,0,1\}$ satisfy $\widehat v\equiv2+4p\pmod 8$ with $p\in\RM(2,6)$, and let $S_0=\{y:v(y)=0\}$, $s=|S_0|=64-\wt(v)$. Then $s$ is even, $\bigoplus_{y\in S_0}y=0$, and $B_p=G(S_0)$. Consequently $\rank(p)=0$ if $s=0$, and $\rank(p)\le s-2$, i.e.\ $\wt(v)\le62-\rank(p)$, if $s>0$.
+\end{lemma}
+
+\begin{proof}
+Since $\widehat v(0)=\sum v\equiv2\pmod 4$, $\wt(v)$ and $s$ are even; since $\widehat v(0)+\widehat v(a)=2\sum_{a\cdot y=0}v(y)\equiv0\pmod 4$, $\#(\{a\cdot y=0\}\setminus S_0)$ is even for all $a$, so $\bigoplus_{S_0}=0$. For any $a,b\in\F_2^6$,
+\[
+  \widehat v(0)+\widehat v(a)+\widehat v(b)+\widehat v(a+b)=4\sum_{y\in\{a,b\}^\perp}v(y).
+\]
+Modulo $8$, the left side is $4B_p(a,b)$ and the right side is $4\#(\{a,b\}^\perp\cap S_0)\equiv4\sum_{y\in S_0}(1+a\cdot y)(1+b\cdot y)=4G(S_0)(a,b)$ (using $|S_0|\equiv0$ and $\bigoplus_{S_0}=0$). Hence $B_p=G(S_0)=\sum_{y\in S_0}yy^T$. If $s>0$, the linear relation $\sum_{S_0}y=0$ gives $\dim\operatorname{span}(S_0)\le s-1$; since $\rank(B_p)$ and $s$ are both even, $\rank(B_p)\le s-2$.
+\end{proof}
+
+\begin{proposition}[closure of II-B3 and II-B2 by hand; reduction of II-B1]\label{prop:IIB123}
+In Branch~II-B with $K_1=\emptyset$ and $p_{00}\equiv0$:
+\begin{enumerate}[label=(\alph*),nosep]
+\item $|K_2|=2$ ($|M|=4$, ``II-B3'') and $|K_2|=1$ ($|M|=6$, ``II-B2'') are impossible.
+\item $|K_2|=0$ ($|M|=8$, Branch~II-B1) leaves only two possibilities up to $v_{01}\leftrightarrow v_{11}$:
+  \begin{itemize}[nosep]
+  \item $(r_0,r_1)=(4,6)$: two $\mathrm{Sp}(6,2)$-orbits of $p_{01}$, represented by \code{0x0025} ($r_G=4$, $4{,}032$ forms) and \code{0x0028} ($r_G=6$, $3{,}780$ forms), with unique weights $(\wt(v_{01}),\wt(v_{11}))=(44,56)$ and tight signed-sum equality on the $16$-flat of $p_{01}$;
+  \item $(r_0,r_1)=(6,6)$: one $\mathrm{Sp}(6,2)$-orbit up to $v_{01}\leftrightarrow v_{11}$, represented by \code{0x02b4} ($2{,}880+2{,}880=5{,}760$ forms), with $(\wt(v_{01}),\wt(v_{11}))\in\{(44,56),(50,50),(56,44)\}$.
+  \end{itemize}
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+With $z_{00}=z_{10}=0$, local enumeration gives $(|z_{01}|,|z_{11}|)\in\{(10,2),(2,10)\}$ on the $N=64-|M|-k_{\mathrm{out}}$ points outside $M\cup K_2$ (say $B$ of $(10,2)$ and $B'=N-B$ of $(2,10)$), $(6,6)$ on the $m_{\mathrm{eff}}=|M|-k_{\mathrm{in}}$ points of $M\setminus K_2$, $(6,2)$ or $(2,6)$ on the $k_{\mathrm{out}}=|K_2|-k_{\mathrm{in}}$ points of $K_2\setminus M$ (say $d_1$ and $d_2$), and $(2,2)$ on $M\cap K_2$ ($k_{\mathrm{in}}$ points). Since $(-1)^{p_{01}}z_{01}$ takes values $+2,-6,+10$ for $|z_{01}|=2,6,10$, Parseval and the inner product with $(-1)^{p_{01}}$ give
+\[
+  \wt(v_{01})=4+\tfrac12(3B+m_{\mathrm{eff}}+d_1),\qquad
+  16+B-m_{\mathrm{eff}}-d_1\le 2^{3-r_0/2}\min\!\big(\wt(v_{01}),2^{r_0}\big),
+\]
+and symmetrically for $v_{11}$ with $(B',d_2,r_1)$ (with $\wt(v_{01})+\wt(v_{11})=100$). In particular $r_0=0\implies B\le m_{\mathrm{eff}}+d_1-8$, $r_0=2\implies B\le m_{\mathrm{eff}}+d_1$, and $r_0=4\implies B\le16+m_{\mathrm{eff}}+d_1$. Since $\bigoplus_M=0$ and $\rank(G(M))=r_G$, we have $|M|\ge r_G+2$.
+
+For $|K_2|=2$ ($|M|=4$): $4\ge r_G+2\implies r_G=2\implies\{r_0,r_1\}=\{2,4\}$, so $N=B+B'\le16+2m_{\mathrm{eff}}+k_{\mathrm{out}}\le26<58\le N$, impossible.
+
+For $|K_2|=1$ ($|M|=6$): $6\ge r_G+2\implies\{r_0,r_1\}\in\{\{2,4\},\{4,4\},\{4,6\}\}$. The first two give $B+B'\le45<57\le N$. For $(4,6)$, $m_{\mathrm{eff}}+d_1\le7-2k_{\mathrm{in}}\le7$, so $B\le16+7=23$ and $\wt(v_{01})\le4+(69+7)/2=42$, forcing $\wt(v_{11})=100-\wt(v_{01})\ge58>56=62-6$, contradicting Lemma~\ref{lem:zsr}.
+
+For $|K_2|=0$ ($|M|=8$, $N=56$, $m_{\mathrm{eff}}=8$, $k_{\mathrm{out}}=d_1=d_2=0$): $r_0\le2$ gives $\wt(v_{01})\le20$ and $\wt(v_{11})\ge80>64$; $(4,4)$ gives $B+B'\le48<56$. For $(4,6)$, $B\le24$ and Lemma~\ref{lem:zsr} ($\wt(v_{11})\le56\implies\wt(v_{01})\ge44\implies B\ge24$) uniquely force $B=24$, $\wt(v_{01})=44$, $\wt(v_{11})=56$, and equality in the signed-sum bound for $v_{01}$. For $(6,6)$, Lemma~\ref{lem:zsr} gives $44\le\wt(v_{01})\le56$ with $\wt(v_{01})$ even, so $B\in\{24,28,32\}$. Under $\mathrm{Sp}(6,2)$, the $5{,}760$ forms of class $(6,6)$ split into two disjoint $2{,}880$-element orbits represented by \code{0x02b4} and $\code{0x02b4}+q_6$; the exact global shear $(x_0,x_1,y)\mapsto(x_0+x_1,x_1,y)$ of Section~5.1 maps $p_{01}\mapsto p_{11}=p_{01}+1+q_6$ ($B_{p_{01}}\mapsto B_{p_{01}}+J$) and exchanges these two orbits bijectively (and likewise orders $r_0\le r_1$ in $(4,6)$). Orbit coverage by \code{0x0025}, \code{0x0028}, and \code{0x02b4} across all $32{,}768$ quadratic forms is checked in \code{verify\_z128\_reductions.cpp}.
+\end{proof}
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{6.5cm} >{\raggedright\arraybackslash}p{5.4cm}@{}}
+\toprule
+branch & reduction and search scope & verifiers, result\\
+\midrule
+I: $L_{00}=\ind_H$ & $416$ words of weight $\le16$; $11$ $G_{\mathrm{lit}}$-orbits ($9$ wt-$12$, $2$ wt-$16$); Lemma~\ref{lem:wt16} normalizes wt-$16$ ($589{,}824\to9{,}216$) & \code{verify\_z128\_reductions}, \code{solve\_branchI\_*}: $0$ joins\\
+II-A: $u\neq0$ & $1{,}260$ degenerate $4$-flats fail (c); $1$ symplectic orbit & \code{verify\_z128\_reductions}, \code{solve\_branchIIA}: $0$ joins\\
+II-B1: $|M|=8$ & $(4,6)$ orbits \code{0x0025}, \code{0x0028} ($B=24$); $(6,6)$ orbit \code{0x02b4} & \code{verify\_z128\_reductions}, \code{solve\_IIB1*}: $0$ hits\\
+II-B2, II-B3 & closed by hand (Proposition~\ref{prop:IIB123}(a)) & by hand\\
+II-B4: $|M|=4$ & $10$ $\mathrm{Stab}_{\mathrm{AffSp}(6,2)}(P)$-orbits covering $5{,}040$ isotropic planes & \code{verify\_z128\_reductions}, \code{solve\_IIB4\_exact}: $0$ hits\\
+\bottomrule
+\end{tabular}
+\caption{Rank~$6$, $|Z|=128$ at $t=100$: complete case tree and orbit verification.}
+\end{table}
+
+\subsection{$|Z|=112$, budget $36$}\label{sec:z112}
+
+Here $q(w,c)=Q_6(c)$ depends only on $c$, so its transform $\widehat q$ is supported on Cell~$0$ (the dual $6$-flat $R\cong\F_2^6$), where $\widehat q(y)=32\,Q_6(y)$. On Cell~$0$, put $V_0=\{y\in R:u_0(y)=0\}$ (the support of $v_0$), $F=\{y\in R:u_0(y)=+Q_6(y)\}$ (the flipped points, disjoint from $V_0$), and $E=V_0\cup F$. Then
+\[
+  u_0=-Q_6+Q_6\ind_{V_0}+2Q_6\ind_F=-Q_6+Q_6\ind_E+Q_6\ind_F.
+\]
+Define the pair $(h,p)$ by $p=|F|$ and $h=|E|+|F|=|V_0|+2p$, so $0\le 2p\le h$ and $|E|=h-p$. By the identity in Proposition~\ref{prop:low} at $r=6$, $\sum_{y\in R}u_0(y)Q_6(y)=-(k+32)$, whereas $\sum_R u_0Q_6=-64+|V_0|+2|F|=-64+h$; therefore
+\[
+  h=32-k,
+\]
+which is even by~\ref{F:parity}. On each group $c$, equation~\eqref{eq:qH} reads $qH(w,c)=-7+4m_w(c)$ with $m_w(c)\in\{0,1,2,3\}$ according as $|H|=7,3,1,5$. Define the \emph{group level}
+\[
+  \operatorname{lv}(c):=\sum_{w\in\F_2^2}m_w(c)\in\{0,1,\dots,12\}.
+\]
+Equating $U_0(c)=\tfrac12Q_6(c)\sum_w(-7+4m_w(c))=Q_6(c)(-14+2\operatorname{lv}(c))$ with $\widehat{u_0}(c)=-8Q_6(c)+s(c)$ gives
+\begin{equation}\label{eq:lv}
+  \operatorname{lv}(c)=3+\frac{Q_6(c)\,s(c)}{2},\qquad
+  s(c):=\sum_{y\in E}Q_6(y)(-1)^{y\cdot c}+\sum_{y\in F}Q_6(y)(-1)^{y\cdot c}.
+\end{equation}
+Writing $k_c=\#\{w:m_w(c)\in\{1,2\}\}$, we have $k_c\ge\ind_{3\nmid\operatorname{lv}(c)}$, so $\wt_3(\operatorname{lv}):=\#\{c:3\nmid\operatorname{lv}(c)\}\le k=32-h$, with non-negative slack $\operatorname{rem}:=(32-h)-\wt_3(\operatorname{lv})$.
+
+\begin{proposition}[exhaustiveness of $0\le h\le16$]\label{prop:h-range}
+At $t=100$, rank~$6$, every admissible configuration has $k\ge16$, i.e.\ $h\in\{0,2,4,\dots,16\}$ ($45$ pairs $(h,p)$ with $0\le 2p\le h$).
+\end{proposition}
+
+\begin{proof}
+We first prove $k\ge9$ by hand. If $k=|A\cup C|\le8$, the $\le7$ differences $a-a_0$ ($a\in A\cup C$) span a proper subspace of $\F_2^8$, so $A\cup C$ lies in an affine hyperplane $\{a:d\cdot a=c_0\}$ ($d\neq0$). On the complementary hyperplane $H_7'=\{a:d\cdot a=1+c_0\}$, $|H|\in\{5,7\}$ everywhere, so the $7$-variable section theorem \code{Balanced242Plateau.section\_0\_b\_0} of~\main{} applies to $D_1(y)=U(y)-(-1)^{c_0}U(y+d)$ and $q_1=q|_{H_7'}$: it forces $b'=80$, $\sum_{y\in\F_2^7}D_1(y)^2=136$, plateau height $m=16$ ($|\widehat{q_1}(y)|\in\{0,16\}$), and the pointwise identity $128\,D_1(y)^2=8\,D_1(y)\widehat{q_1}(y)+\widehat{q_1}(y)^2$. Because $\widehat{q_1}(y)=\tfrac12(\widehat q(y)-(-1)^{c_0}\widehat q(y+d))$ and $|\widehat q|=32$ on the $64$-point flat $R$, $|\widehat{q_1}(y)|=16$ holds on $64$ pairs $\{y,y+d\}$, each meeting $R$ in exactly one point $x$. On those $64$ pairs, the pointwise identity gives $D_1(y)\operatorname{sgn}(\widehat{q_1}(y))\in\{+2,-1\}$ (and $D_1=0$ elsewhere); letting $p_1$ count the $+2$ pairs gives $4p_1+(64-p_1)=136$, so $p_1=24$. At every $+2$ pair, $|U|\le1$ forces $U(x)\sigma(x)=+1$ on the unique $x\in\{y,y+d\}\cap R$, giving $p=|F|\ge24$ and $32-k=h\ge2p\ge48$, contradiction.
+
+For the remaining even values $k\in\{10,12,14\}$, \code{t94/check\_small\_masks.cpp} exhaustively enumerates all sign/geometry patterns for $9\le k\le15$ at $t\in\{94,96,98,100\}$ and reports $0$ survivors. Hence $k\ge16$ and $h=32-k\le16$.
+\end{proof}
+
+\begin{lemma}[$1$-WHT mod-$3$ extension identity]\label{lem:mod3-ext}
+Let $E'\subset\F_2^6$ have size $15$. Define $w(c):=\sum_{y\in E'}Q_6(y)(-1)^{y\cdot c}$ and let $f:\F_2^6\to\{-1,0,1\}$ satisfy $f(c)\equiv w(c)\pmod 3$. For any $x_0\in\F_2^6$, let $\delta(c)=Q_6(x_0)(-1)^{x_0\cdot c}$ and $s=w+\delta$ (corresponding to $(h,p)=(16,0)$ if $x_0\notin E'$ and $(16,1)$ if $x_0\in E'$). Then
+\[
+  \#\{c\in\F_2^6:3\mid\operatorname{lv}(c)\}=\frac{\wt(f)-Q_6(x_0)\,\widehat f(x_0)}{2}.
+\]
+\end{lemma}
+
+\begin{proof}
+From~\eqref{eq:lv}, $3\mid\operatorname{lv}(c)$ holds iff $3\mid s(c)$. Since $\delta(c)\in\{\pm1\}$, we have $3\mid(w(c)+\delta(c))$ iff $f(c)=-\delta(c)$, whose indicator is $(|f(c)|-f(c)\delta(c))/2$. Summing over $c\in\F_2^6$ gives the formula.
+\end{proof}
+
+\begin{lemma}[exact classification of $\beta_U$ and $\beta_V$]\label{lem:betaU}
+On the three nonzero high cells $x\in\{1,2,3\}$, $U_x(c)=2Q_6(c)\sum_w(-1)^{w\cdot x}m_w(c)$ is even, and its mod-$4$ phase $\beta_U(c):=(U_x(c)/2)\bmod2\in\RM(1,6)$ is independent of $x$ and equals
+\[
+  \beta_U(c)=\operatorname{lv}(c)\bmod2
+  =\Big(1+p+\tfrac12\sum_{y\in V_0}Q_6(y)\Big)+c\cdot\Big(\bigoplus_{y\in V_0}y\Big).
+\]
+In particular, all three affine types $\beta_U\equiv1$, $\beta_U\equiv0$ and $\beta_U=\ind_H$ occur (the middle type is precisely the $h=16,p=6$ family). On the low cell $0$, $\beta_V(c):=(z_0(c)/2)\bmod2\in\RM(1,6)$ cannot satisfy $\beta_V\equiv1$ when $|V_0|\le16$.
+\end{lemma}
+
+\begin{proof}
+Modulo $2$, $U_x(c)/2\equiv\sum_wm_w(c)=\operatorname{lv}(c)$. From~\eqref{eq:lv}, $Q_6(c)s(c)=Q_6(c)\sum_{V_0}Q_6(y)(-1)^{y\cdot c}+2Q_6(c)\sum_FQ_6(y)(-1)^{y\cdot c}\equiv\sum_{V_0}Q_6(y)+2\,c\cdot\bigoplus_{V_0}+2p\pmod4$ (as $|V_0|$ is even, $\sum_{V_0}Q_6$ is even and multiplying by $Q_6(c)=\pm1$ preserves it mod~$4$). Dividing by $2$ and adding $3\equiv1\pmod2$ gives the formula for $\beta_U$. On the low side, if $\beta_V\equiv1$, every group in $Z_6$ has $z_0\equiv2\pmod4$ and hence an odd number of zeros (at least $1$, totaling $\ge28$ defects), leaving at most $36-28=8$ defects on $F_6$. Since $|z_0|\in\{2,10\}$ on $F_6$ requires $k_c\ge1$ ($2$ defects), at least $36-4=32$ groups of $F_6$ must have $|z_0|=6$, giving $64|V_0|=\sum z_0^2\ge32\cdot36+32\cdot4=1280$, so $|V_0|\ge20>16$.
+\end{proof}
+
+Three further reductions close the high-block survivors for every $(h,p)$:
+\begin{enumerate}[label=(R\arabic*),nosep]
+\item \emph{Hand proof of $(h,p)=(0,0)$ ($\operatorname{lv}\equiv3$, $k=32$).} At $\operatorname{lv}=3$, every $m$-tuple has $\#\{x:|U_x|=2\}=k_c$, so $\sum_{x=1}^3 m_2(u_x)=32$ and some cell $u=u_x$ has $m:=m_2(u)\le10$ and $|\widehat u|\in\{2,6\}$ with $\widehat u(c)=(-6+8\ind_S(c))(-1)^{p(c)}$, $|S|=m$, $p\in\RM(2,6)$ of polar rank $r\in\{0,2,4,6\}$. Parseval gives $\wt(u)=36-m/2$, and Fourier inversion gives $g(y):=\sum_{c\in S}(-1)^{p(c)+c\cdot y}=8u(y)+\tfrac34\widehat{(-1)^p}(y)$, with $\sum_y g(y)^2=64m$. On the $2^r$-point dual flat $R_p$ of $p$, $v:=\tfrac34\cdot2^{6-r/2}\in\{48,24,12,6\}$: for $r\in\{0,2,4\}$, letting $z=\#\{y\in R_p:u(y)=0\}$, we get
+\begin{align*}
+  64m=\sum_y g(y)^2
+  &\ge v^2z+(v-8)^2(2^r-z)+64\big(\wt(u)-(2^r-z)\big)\\
+  &=16vz+2304-32m+(v^2-16v)2^r,
+\end{align*}
+so $96m\ge3840,3072,1536$, i.e.\ $m\ge40,32,16$ for $r=0,2,4$; for $r=6$ ($v=6$, $R_p=\F_2^6$), $64m\ge36(64-\wt(u))+4\wt(u)=1152+16m\implies m\ge24$. Thus $m\ge16>10$ unconditionally.
+\item \emph{$H_5$ $m_2$-lemma ($\beta_U=\ind_H$).} When $\operatorname{lv}\equiv3$ on all $32$ points of $H$, the folded half-table $u_H:\F_2^5\to\{-2,-1,0,1,2\}$ of each cell $u_x$ is tested over all $1{,}024$ quadratic forms on $\F_2^5$: $m_2\in\{0,1,3\}$ have $0$ solutions ($m_2=2$ has $13{,}888$). Hence $\operatorname{rem}<6$ is immediately impossible, and $\operatorname{rem}=6$ forces $m_2=2$ on all three cells and zero extra slack on $H^c$.
+\item \emph{Weighted pigeonhole and translation symmetry ($\beta_U\equiv1$).} Over all $128$ odd-level $4$-tuples $m\in\{0,1,2,3\}^4$, setting $a_c=\#\{x:\operatorname{lv}\in\{3,9\},|U_x|=2\}$, $b_c=\#\{x:\operatorname{lv}\in\{5,7\},|U_x|=6\}$ and $\mathrm{extra}_c=k_c-\ind_{3\nmid\operatorname{lv}}$ satisfies $2a_c+b_c\le2\,\mathrm{extra}_c$ identically. Hence at least one cell $u_x$ has weighted cost $2a_x+b_x\le\lfloor 2\operatorname{rem}/3\rfloor$. Moreover, any translation $v\in\F_2^6$ preserving the level partition $(\{1,11\},\{3,9\},\{5,7\})$ acts as an exact involution on solutions for each fixed quadratic phase $p$ via $u''(y)=(-1)^{\varepsilon_v+(y+a_v)\cdot v}u(y+a_v)$, where $p(c+v)=p(c)+a_v\cdot c+\varepsilon_v$; placing two independent translations in the top two bits of a $\mathrm{GL}(6,2)$ basis halves both half-budgets without loss of generality.
+\end{enumerate}
+
+\begin{remark}[audit of \code{t100/z112/} --- three gaps caught and closed]\label{rem:z112-audit}
+A line-by-line audit of the $13$ verifiers in \code{nl242\_top\_closure.zip/t100/z112/} against the reductions above uncovered three genuine omissions:
+\begin{enumerate}[nosep]
+\item \emph{Factor-of-$2$ bug in \code{check\_v0}.} Both \code{scan\_all\_11\_13.cpp} and \code{scan\_h16\_p2.cpp} charged $4$ defects instead of $2$ for every $F_6$-group with $|z_0|\in\{4,8\}$, plus an unproven $+8$ offset at $\beta_V=0$. In fact the group $f=(1,3,3,-3)$ on $F_6$ has $z_0=4$ and $n_8=1$, costing only $2$ defects, while $0\in Z_0$ and evenness of $\#\{\text{zeros}\}$ on $Z_6$ when $4\mid z_0$ justify an offset of $+2$. Fixing \code{check\_v0} to exact $2\times$ (verified over all $81+256=337$ local low-block tuples) restored dozens of cases across $(h,p)=(4,0),(6,0),(8,2),(12,1),(12,2),(12,4),(14,4),(16,2),(16,3),(16,4)$.
+\item \emph{Unscanned pair $(h,p)=(16,1)$.} The size-$15$ scan checked $(16,0)$ ($x_0\notin E'$) but omitted $(16,1)$ ($x_0\in E'$), which has a real survivor ($E=\code{0x50500330537}$, $F=\code{0x1}$, $\operatorname{rem}=1$, $\min D=32\le36$).
+\item \emph{Omitted $\beta_U\equiv1$ cases.} Both $(h,p)=(0,0)$ (now closed by hand in~(R1)) and two of the six $(16,0)$ orbits (\code{0xff00ff} and \code{0xcc003300ff}, each with $\min D=32$) were absent from \code{kill\_betaU1\_fast.cpp}.
+\end{enumerate}
+All $45$ pairs $(h,p)$ ($0\le h\le16$ even, $0\le2p\le h$) are now closed in a single self-contained verifier \code{verify\_z112\_all45\_exact.cpp} with $7$ mandatory positive controls: it regenerates $\mathrm{AffSp}(6,2)$ orbits for sizes $0$--$10$ ($773$ at size~$9$, $2{,}965$ at size~$10$), reads sizes $11$--$15$ ($11{,}356$, $43{,}902$, $161{,}196$, $560{,}256$, $1{,}812{,}230$), finds $302$ level survivors, eliminates $175$ via exact \code{check\_v0} and $16$ via~(R2), and kills all $111$ live cases ($0$ survivors, Table~\ref{tab:z112}).
+\end{remark}
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.8cm} r >{\raggedright\arraybackslash}p{6.6cm}@{}}
+\toprule
+stage / live class & count & how closed (\code{verify\_z112\_all45\_exact.cpp})\\
+\midrule
+All $45$ pairs $(h,p)$ passing level bound & $302$ & $0\le h\le16$ even, sizes $0$--$16$ (Lemma~\ref{lem:mod3-ext} at $15$--$16$)\\
+\quad killed by exact \code{check\_v0} ($\min D>36$) & $-175$ & exact $2\times$ on $F_6$, verified on all $337$ low tuples\\
+\quad killed by $H_5$ $m_2$-lemma ($\operatorname{rem}<6$) & $-16$ & (R2), verified over all $1{,}024$ quad forms on $\F_2^5$\\
+\midrule
+Live cases remaining & $111$ & breakdown below (all preconditions asserted)\\
+\quad $(h,p)=(0,0)$ ($\operatorname{rem}=32$) & $1$ & hand proof (R1): $m_2\ge16>10$\\
+\quad $\beta_U\equiv0$ ($h=16,p=6$, $\operatorname{rem}=0$) & $8$ & exact $\RM(2,6)$ triple search ($0$ triples)\\
+\quad $\beta_U=\ind_H$ ($\operatorname{rem}\in\{0,2\}$ or $\operatorname{lv}_3=32,\operatorname{rem}=6$) & $23$ & exact $H/H^c$ half-join + triple check ($0$ triples)\\
+\quad $\beta_U\equiv1$, $\operatorname{rem}\le8$ (incl.\ $h16p1$, all $6$ $h16p0$) & $63$ & exact weighted budget $2a+b\le\lfloor2\operatorname{rem}/3\rfloor$ ($0$ hits)\\
+\quad $\beta_U\equiv1$, $\operatorname{rem}\in\{12,16\}$ ($14\times h12p4$, $h4p0$, $h8p0$) & $16$ & weighted budget + automatic $\mathrm{GL}(6,2)$ $2$-translation symmetry (R3) ($0$ hits)\\
+\midrule
+\textbf{Total surviving configurations} & $\mathbf{0}$ & \textbf{$111/111$ killed in $24.9\,\mathrm{s}$ ($7/7$ positive controls pass)}\\
+\bottomrule
+\end{tabular}
+\caption{Audited closure of rank~$6$, $|Z|=112$ across all $45$ pairs $(h,p)$ at $t=100$.}
+\label{tab:z112}
+\end{table}
+
+% ===========================================================================
+\section{Replay record}
+% ===========================================================================
+
+The archived verifiers for $t=100$ are in \code{nl242\_top\_closure.zip} and were replayed from that packet on a fresh Colab machine on 22~November 2026, each exiting with code~$0$: the quick rank-$8$ set (Table~\ref{tab:r8}, rows $12$--$20$, and the two lemma scripts), the heavy rank-$8$ set ($n_0=22,24,26$), and all $23$ rank-$6$ verifiers. The $n_0=22$ solver needed a one-line portability fix (a missing \code{\#include}) before it would build with GCC; after the fix it reproduced the recorded counts exactly ($8{,}655$ orbits, $311{,}580$ pairs, \code{REAL\_V}~$=0$).
+
+Following that replay, the entire rank-$6$ reduction and completeness audit was carried out and packaged directly into \code{nl242\_top\_closure.zip} ($104$ SHA-256-verified files, wired into \code{verify\_quick.sh} and mirrored in \code{t100\_r6\_audit/}) as three standalone C++17 programs:
+\begin{itemize}[nosep]
+\item \code{t100/z128/verify\_z128\_reductions.cpp} (exit~$0$ in $0.21\,\mathrm{s}$): verifies all $288$ local group identities, regenerates all $11$ Branch~I orbits under $G_{\mathrm{lit}}$, verifies the $2{,}604$ affine $4$-flats of Branch~II-A, checks the Gram identity and $\mathrm{Sp}(6,2)$-orbits \code{0x0025}, \code{0x0028}, \code{0x02b4} across all $32{,}768$ quadratic forms, confirms $0$ arithmetic solutions for II-B2 and II-B3 under Lemma~\ref{lem:zsr}, and regenerates all $10$ Branch~II-B4 isotropic-plane orbits ($5{,}040/5{,}040$).
+\item \code{t100/z112/check\_small\_masks.cpp} (exit~$0$ in $8\,\mathrm{s}$): exhaustively excludes $9\le k\le 15$ at $t\in\{94,96,98,100\}$ ($0$ survivors).
+\item \code{t100/z112/verify\_z112\_all45\_exact.cpp} (exit~$0$ in $24.9\,\mathrm{s}$): runs $7$ mandatory positive controls (including the exact $2\times$ \code{check\_v0} table, $12{,}800$ brute-force checks of Lemma~\ref{lem:mod3-ext}, the $13{,}888$-hit $H_5$ control, and planted ternary witnesses for $\beta_U\equiv0$, $\beta_U\equiv1$, and $\beta_U=\ind_H$), scans all $45$ pairs $(h,p)$, and kills all $111$ live cases with $0$ survivors, superseding the legacy \code{t100/z112/} scripts in \code{nl242\_top\_closure.zip}.
+\end{itemize}
+
+The hand proofs in Sections~\ref{sec:low}--\ref{sec:r6} use only the facts \ref{F:mass}--\ref{F:parity} from~\main{}, the formalized section theorem \code{Balanced242Plateau.section\_0\_b\_0}, and standard properties of quadratic forms over $\F_2$. The numerical inputs quoted in Section~\ref{sec:r8} ($|Z|=120$, the rank $84$ of $\RM(3,8)|_Z$, the $119/136$ hyperplane split, the $136$ zeros of $\binom{\wt}{2}$, and the evenness of $\sum_Fu^I$ for $|I|\le4$) were rechecked by a separate short script.
+
+\begin{thebibliography}{9}
+\bibitem{Main}
+D.~A.~Shittu, \emph{No balanced $9$-variable Boolean function has nonlinearity $242$: spectral-phase obstructions, formalized exclusions, and exact certificates}, preprint, version~1, 2026.
+
+\bibitem{Delsarte}
+P.~Delsarte, \emph{An algebraic approach to the association schemes of coding theory}, Philips Research Reports Supplements \textbf{10} (1973).
+
+\bibitem{MS}
+F.~J.~MacWilliams and N.~J.~A.~Sloane, \emph{The Theory of Error-Correcting Codes}, North-Holland, 1977.
+
+\bibitem{Massey}
+J.~L.~Massey, \emph{Linear codes with complementary duals}, Discrete Mathematics \textbf{106/107} (1992), 337--342.
+\end{thebibliography}
+
+\end{document}

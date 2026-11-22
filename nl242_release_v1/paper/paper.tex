@@ -1,0 +1,745 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\wt}{\operatorname{wt}}
+\newcommand{\nl}{\operatorname{nl}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\Kraw}{\operatorname{Kraw}}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\code}[1]{{\ttfamily\small\renewcommand{\_}{\textunderscore\allowbreak}#1}}
+
+% ============================================================================
+% TITLE & METADATA
+% ============================================================================
+\title{No Balanced $9$-Variable Boolean Function Has Nonlinearity $242$:\\
+Spectral-Phase Obstructions, Formalized Exclusions, and Exact Certificates}
+
+\author{Daniel Ayomide Shittu\thanks{Repository, Lean~4 formalization, and replayable verification artifacts: \texttt{[GITHUB\_URL]} (Zenodo DOI: \texttt{[ZENODO\_DOI]}).}}
+\date{Preprint, version~1 (November 2026)}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The maximum nonlinearity of a balanced nine-variable Boolean function is exactly $240$.
+Thus $n = 9$ is the smallest odd dimension in which requiring balance strictly lowers the maximum nonlinearity below the covering radius ($240 < 242 \le \rho(1,9)$, whereas balanced functions attain $\rho(1,n) = 0, 2, 12, 56$ for $n = 1, 3, 5, 7$), resolving a problem open since Kavut, Maitra, and Y\"ucel constructed unbalanced $9$-variable functions of nonlinearity $242$ in 2006--2007.
+We develop a spectral-phase plateau theory for putative balanced $9$-variable functions with $\max_a |W_F(a)| \le 28$, combining a bottom-up high-block quartic exclusion pipeline ($t \le 98$) with a top-down low-block $\mathrm{RM}(3,8)$ and signed-Delsarte exclusion pipeline ($t \ge 100$), and formalize the core mathematical architecture and upper-endpoint closures in \textbf{zero-Mathlib Lean~4.15.0} (all 79 modules are compiled and archived in the public replay bundle with zero \code{sorry}, zero \code{native\_decide}, and zero custom axioms, culminating in the top-level coordinate-free master theorems \code{Balanced242Master.\allowbreak no\_balanced\_9var\_nl242\_direct} and \code{Balanced242Master.\allowbreak no\_balanced\_9var\_nl242}).
+
+Our main unconditional structural results---all proved in prose here and machine-verified in the archived 79-module Lean~4 bundle---include the following:
+\begin{enumerate}[nosep]
+  \item A standalone Lean-verified proof that no balanced $9$-variable function achieves nonlinearity $244$ (and every balanced function with $|W_F|\le 28$ attains $|W_F|=28$).
+  \item The \emph{Global Rank-$8$ Parity Law}: the $8$-variable quadratic spectral-phase indicator $\beta_8$ of any split with $W_{\mathrm{hi}} \equiv 4 \pmod 8$ has full symplectic rank~$8$ if and only if the exceptional frequency count $k = |A| + |C|$ is odd.
+  \item The \emph{Anchor-Pair $63/64$ Rank-Splitting Theorem}: along any hyperplane slice of a rank-$8$ function, of the $127$ quotient directions in $\F_2^7 \setminus \{0\}$, exactly $63$ simultaneously induce rank-$4$ $6$-variable subsections on both halves and exactly $64$ induce rank-$6$ subsections.
+  \item A closed-form lower bound on the exception weight of any $7$-variable rank-$6$ section, an all-degree shifted multivariate Krawtchouk Farkas engine, $\F_2$-barycenter marker-center puncturing laws, constructive zero-Mathlib proofs of the binary Griesmer bound, sphere-packing bound ($d \ge 3$), and non-existence of a $[24,8,\ge 10]_2$ linear code, together with the full rank-$8$ quartic high-block inversion/hinge/dual-cut theory and the universal low-block defect-budget and autocorrelation laws.
+  \item Unconditional Lean-verified exclusions of the $t = 98$ rank-$6$ normal form with $|Z| = 144$, $t = 108$ rank-$6$ $|Z| = 112$, all $t \ge 104$ rank~$8$, rank~$2$ ($|Z| = 64$) for all $t \le 112$, all ranks at $t = 112$ (zero LP), all ranks at $t = 114$ and the $k = 12$ branch of $t = 116$ via $[12,9,4]$ sphere packing, all ranks at $t = 118$ (low-block RREF cuts), $t \ge 120$, the $t = 116, k = 16$ plane-switching reduction, and the exact Walsh $\bmod\;16$ energy dichotomy for $t = 96$ rank-$8$ profile $(0,31,39)$.
+\end{enumerate}
+Combining these kernel-verified structural theorems with exact-integer Farkas, anchor-pair, and centered certificates ($t \le 94$ and $t = 96$ centered leaves), replayable high-block quartic four-cell enumerations with exact integer dual exclusions and Fourier character-sum orbit completeness ($t = 96, 98$), and top-down low-block exact rational Farkas/LP duals, zero-LP $\mathrm{RM}(3,8)$ $\bmod\;8$ $y_Z$ enumerations, and the audited rank-$6$ reductions and exact solvers ($t = 100, 102, \ge 104$, detailed in \code{t100.tex}) exhausts every derivative half-agreement count $t$.
+At $t=114,116$, the final $k=16$ residual is closed by \textbf{three independent routes}: (i) a direct eight-variable $\mathrm{AG}(6,2)$ enumeration of all $16$-point dual geometries and their low complements (\code{nl242\_endpoint\_closure.zip}), (ii) a separate $\mathrm{RM}(3,5)$ codimension-$1$ code-lift cross-check scoring all $70$ admissible lifts (\code{nl242\_endpoint\_crosscheck.zip}), and (iii) a full independent re-verification of $\rho(1,9) < 244$ over all $349$ Brier--Langevin cubic classes following Wang, Lou, and Wang~\cite{WLW2026} (\code{nl244\_verify.zip}, Section~\ref{sec:nl244}).
+Together, these yield an unconditional computer-assisted proof that $\nl_{\mathrm{bal}}(9)=240$.
+This is a computer-assisted proof: its correctness includes the correctness of our code, and all of that code is published with the paper.
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================================
+\section{Introduction}
+\label{sec:intro}
+% ============================================================================
+
+Let $F : \F_2^9 \to \F_2$ be a $9$-variable Boolean function. Its \emph{Walsh--Hadamard transform} is
+\[
+  W_F(\omega) \;=\; \sum_{x \in \F_2^9} (-1)^{F(x) \oplus \langle \omega, x \rangle}, \qquad \omega \in \F_2^9,
+\]
+and its \emph{nonlinearity} is $\nl(F) = 256 - \frac{1}{2}\max_{\omega \in \F_2^9} |W_F(\omega)|$.
+A function $F$ is \emph{balanced} if $W_F(0) = 0$.
+For odd $n$, the bent concatenation bound yields balanced functions of nonlinearity $2^{n-1} - 2^{(n-1)/2}$; for $n = 9$, this baseline is $240$ ($\max |W_F| = 32$).
+In 2006--2007, Kavut, Maitra, and Y\"ucel~\cite{KMY2006,KMY2007} broke the bent-concatenation barrier by finding rotation-symmetric $9$-variable Boolean functions of nonlinearity $242$ ($\max |W_F| = 28$), and Patterson--Wiedemann~\cite{PW1983} had earlier done so for $n = 15$.
+However, the functions of~\cite{KMY2007} are unbalanced (having $|W_F(0)| \neq 0$), and every subsequent computational search for a \emph{balanced} $9$-variable function of nonlinearity $242$ (e.g.,~\cite{KY2010,Carlet2021}) has come up empty.
+The question of whether balanced $9$-variable functions of nonlinearity $242$ exist has therefore stood open for nearly two decades.
+
+\paragraph{The smaller odd dimensions.}
+For $n=2m+1\in\{1,3,5,7\}$, the function
+$F_n(x)=x_n+\sum_{j=1}^{m}x_{2j-1}x_{2j}$ over $\F_2$ is balanced.
+Its last bit gives a Walsh factor of $0$ or $2$, and each quadratic pair
+gives a factor of magnitude $2$. Its Walsh peak is therefore $2^{m+1}$.
+For the matching upper bound on nonlinearity, extend any $n$-variable
+function to seven variables by adding $(7-n)/2$ disjoint quadratic pairs.
+The Walsh peak is multiplied by $2^{(7-n)/2}$. Mykkeltveit's theorem
+$\rho(1,7)=56$ gives a seven-variable peak of at least $16$,
+so the original peak is at least $2^{m+1}$~\cite{Mykkeltveit1980}.
+The balanced and unrestricted maxima thus coincide at $0,2,12,56$,
+respectively. At nine variables a single unrestricted witness of
+nonlinearity $242$ suffices for the strict comparison with $240$.
+
+\subsection{Overview of the Approach}
+Rather than searching directly over the $\binom{512}{256} \approx 4.7 \times 10^{152}$ balanced $9$-variable functions, we split $F$ along an affine hyperplane into two $8$-variable halves $f, g : \F_2^8 \to \F_2$.
+Writing $\mathrm{lo}(a) = W_f(a) + W_g(a)$ and $\mathrm{hi}(a) = W_f(a) - W_g(a)$ for the two $256$-point Walsh blocks, balance $W_F(0) = 0$ forces $W_f(0) = -W_g(0)$, and the nonlinearity cap $\max |W_F| \le 28$ becomes $|\mathrm{lo}(a)| \le 28$ and $|\mathrm{hi}(a)| \le 28$.
+The central parameter is the \emph{half-agreement count}
+\[
+  t \;=\; \#\{x \in \F_2^8 : f(x) = g(x)\},
+\]
+which controls the Parseval energy of both the agreement table $V(x) = \frac{1}{2}((-1)^{f(x)} + (-1)^{g(x)}) \in \{0, \pm 1\}$ and the disagreement table $U(x) = \frac{1}{2}((-1)^{f(x)} - (-1)^{g(x)}) \in \{0, \pm 1\}$ via $\mathrm{lo} = 2\widehat{V}$ and $\mathrm{hi} = 2\widehat{U}$.
+Because $F$ can be split along \emph{any} nonzero direction $a \in \F_2^9 \setminus \{0\}$, ruling out a value of $t$ for every adapted half-split simultaneously excludes that autocorrelation value $\Delta_F(a) = 4t - 512$ across the entire domain.
+
+Our key conceptual observation is that the \emph{high-block phase indicator}
+\[
+  \beta_8(a) \;=\; \frac{\mathrm{hi}(a) - 4}{8} \bmod 2, \qquad q_8(a) = (-1)^{\beta_8(a)},
+\]
+is not an arbitrary Boolean function: whenever $\mathrm{hi}(a) \equiv 4 \pmod 8$, third differences of $\mathrm{hi}$ vanish modulo $16$, forcing $\beta_8$ to be a \emph{quadratic Boolean function} on $\F_2^8$ (a ``cube'' function, $\deg(\beta_8) \le 2$).
+Its alternating polar form $B(u, v) = \beta_8(0) \oplus \beta_8(u) \oplus \beta_8(v) \oplus \beta_8(u \oplus v)$ has even symplectic rank $r \in \{0, 2, 4, 6, 8\}$, which imposes severe rigidity on:
+\begin{itemize}[nosep]
+  \item the parity of exceptional frequencies ($r = 8 \iff |A| + |C|$ is odd, Theorem~\ref{thm:rank8-parity}),
+  \item the simultaneous ranks of $6$-variable sub-sections on opposite sides of any hyperplane (the $63/64$ law, Theorem~\ref{thm:anchor6364}),
+  \item exact all-degree shifted and unshifted multivariate Krawtchouk inequalities over the four magnitude classes $A, B, C, D$ (Section~\ref{sec:krawtchouk}),
+  \item $\F_2$-barycenter translation and marker-center puncturing (Section~\ref{sec:barycenter}), and
+  \item residual binary linear codes in hyperplanes, colliding with the Griesmer and sphere-packing bounds (Section~\ref{sec:coding}).
+\end{itemize}
+
+\subsection{Reading This Paper Without Opening Lean}
+Every mathematical theorem in Sections~\ref{sec:setup}--\ref{sec:t9698} is proved here in complete, self-contained mathematical prose.
+The zero-Mathlib Lean~4 formalization (all 79 modules compiled and archived) gives an independent machine audit of the results listed in Layers~A and~B of Table~\ref{tab:trust}. It does \emph{not} cover the large finite enumerations of Layer~C, which are checked by the published C++ and Python verifiers.
+Section~\ref{sec:verification} gives a Theorem-to-Lean cross-reference table and an explicit three-layer trust boundary, so that referees can see exactly what is checked by the Lean~4 kernel and what depends on replayable finite enumerations.
+
+\paragraph{A computer-assisted proof.}
+Several cases are closed by exhaustive computer enumeration rather than by hand. The correctness of the main theorem therefore includes the correctness of our code. This is normal for results of this kind, and we treat it accordingly: every enumerator and verifier is published as source in SHA-256-manifested replay packets, the packets include positive controls, and the heaviest steps were replayed independently.
+
+% ============================================================================
+\section{Half-Split Setup, Residue Structure, and Unconditional Non-Existence of NL244}
+\label{sec:setup}
+% ============================================================================
+
+Fix a balanced $9$-variable Boolean function $F : \F_2^9 \to \F_2$ with $\max_{\omega} |W_F(\omega)| \le 28$.
+Splitting along any coordinate gives $f, g : \F_2^8 \to \F_2$ with
+\[
+  \mathrm{lo}(a) = W_f(a) + W_g(a), \qquad \mathrm{hi}(a) = W_f(a) - W_g(a), \qquad a \in \F_2^8.
+\]
+Let $U(x) = \frac{1}{2}((-1)^{f(x)} - (-1)^{g(x)}) \in \{0, \pm 1\}$ and $V(x) = \frac{1}{2}((-1)^{f(x)} + (-1)^{g(x)}) \in \{0, \pm 1\}$, so that $\supp(U)$ and $\supp(V)$ partition $\F_2^8$ into sizes $256 - t$ and $t$, respectively, with $\widehat{V} = \mathrm{lo}/2$ and $\widehat{U} = \mathrm{hi}/2$.
+
+\begin{definition}[Magnitude classes and reduced high transform]
+\label{def:classes}
+When $\mathrm{hi}(a) \equiv 4 \pmod 8$ for all $a \in \F_2^8$ and $|\mathrm{hi}(a)| \le 28$, set $H_8(a) = \mathrm{hi}(a)/4 \in \{\pm 1, \pm 3, \pm 5, \pm 7\}$.
+Partition $\F_2^8$ into four pairwise-disjoint magnitude classes:
+\[
+  A = \{a : |H_8(a)| = 1\},\quad
+  B = \{a : |H_8(a)| = 5\},\quad
+  C = \{a : |H_8(a)| = 3\},\quad
+  D = \{a : |H_8(a)| = 7\},
+\]
+with sizes $(a, b, c) = (|A|, |B|, |C|)$ and $|D| = 256 - a - b - c$.
+Define the \emph{mass weight} $A_{\mathrm{mass}}(a) = (49 - H_8(a)^2)/8$, which takes values $6, 3, 5, 0$ on $A, B, C, D$, respectively.
+\end{definition}
+
+By Parseval's identity on $U$,
+\[
+  \sum_{a \in \F_2^8} H_8(a)^2 = \frac{1}{16}\sum_{a \in \F_2^8} \mathrm{hi}(a)^2 = \frac{1}{4}\sum_{a \in \F_2^8} \widehat{U}(a)^2 = 64(256 - t).
+\]
+Hence the total high-block mass satisfies
+\begin{equation}
+\label{eq:total-mass}
+  6a + 3b + 5c \;=\; \sum_{x \in \F_2^8} \frac{49 - H_8(x)^2}{8} \;=\; 8t - 480.
+\end{equation}
+
+\begin{theorem}[Unconditional non-existence of balanced $\nl(9) = 244$ and forced peak $28$]
+\label{thm:no244}
+Let $F : \F_2^9 \to \F_2$ be balanced. Then:
+\begin{enumerate}[nosep]
+  \item $\max_{\omega \in \F_2^9} |W_F(\omega)| \ge 28$, i.e., $\nl(F) \le 242$.
+  \item If $\max_{\omega \in \F_2^9} |W_F(\omega)| \le 28$, then $\max_{\omega} |W_F(\omega)| = 28$ and there exist adapted coordinates in which $\mathrm{hi}(a) \equiv 4 \pmod 8$ for all $a \in \F_2^8$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}[Proof sketch (formally verified in \code{Balanced242No244})]
+Balance forces $W_F(\omega) \equiv 0 \pmod 4$ for every $\omega$. If $|W_F(\omega)| \le 24$ everywhere, the shifted residue-class weights modulo $8$ yield an adapted splitting whose $8$-variable blocks satisfy the quadratic phase identity and Parseval energy identity with $H_8(a) \in \{\pm 1, \pm 3, \pm 5\}$ ($|D| = 0$). However, the third-difference divisibility of $\widehat{U}$ forces the phase indicator $\beta_8$ to be quadratic, and comparing $\sum_a (-1)^{\beta_8(a)} H_8(a)$ against Parseval and plateau spectrum sizes $16 \cdot 2^{4-r/2}$ leaves no integral solution for $(a, b, c)$. Thus $\max |W_F| \le 24$ is impossible, forcing $|W_F| = 28$ whenever $|W_F| \le 28$.
+\end{proof}
+
+% ============================================================================
+\section{Global Spectral-Phase Geometry: Rank-$8$ Parity and the $63/64$ Law}
+\label{sec:phase-geometry}
+% ============================================================================
+
+Assume henceforth that $(f, g)$ is an adapted pair with $\mathrm{hi}(a) \equiv 4 \pmod 8$ and $|\mathrm{hi}(a)| \le 28$ for all $a \in \F_2^8$.
+Define the phase bit $\beta_8 : \F_2^8 \to \F_2$ by $\beta_8(a) = 0 \iff \mathrm{hi}(a) \equiv 4 \pmod{16}$ (so $q_8(a) = (-1)^{\beta_8(a)} \in \{\pm 1\}$ satisfies $q_8(a) H_8(a) \in \{1, -3, 5, -7\}$ on $A, C, B, D$, respectively).
+
+\begin{lemma}[Quadraticity of $\beta_8$]
+\label{lem:beta8-cube}
+For all $a, u, v, w \in \F_2^8$, the third discrete difference of $\beta_8$ vanishes modulo $2$:
+\[
+  \bigoplus_{S \subseteq \{u, v, w\}} \beta_8\!\left(a \oplus \bigoplus_{s \in S} s\right) \;=\; 0.
+\]
+Hence $\beta_8 \in \mathrm{RM}(2, 8)$ is a quadratic Boolean function, and its Walsh spectrum satisfies $\widehat{q_8}(x) \in \{0, \pm 2^{8 - r/2}\}$ where $r \in \{0, 2, 4, 6, 8\}$ is the symplectic rank of its polar bilinear form $B(u, v) = \beta_8(0) \oplus \beta_8(u) \oplus \beta_8(v) \oplus \beta_8(u \oplus v)$.
+\end{lemma}
+\begin{proof}
+Since $U : \F_2^8 \to \{0, \pm 1\}$ is integer-valued and $\mathrm{hi} = 2\widehat{U}$, the third difference $\Delta_u \Delta_v \Delta_w \mathrm{hi}(a)$ equals $2 \sum_x U(x)\chi_a(x)(1-\chi_u(x))(1-\chi_v(x))(1-\chi_w(x))$, whose every summand is divisible by $2 \cdot 2^3 = 16$. Dividing by $8$ yields $\sum_{S} \beta_8(a \oplus \bigoplus S) \equiv 0 \pmod 2$.
+\end{proof}
+
+\subsection{The Global Rank-$8$ Parity Law}
+
+When $r = 8$ (i.e., $q_8$ is bent on $\F_2^8$), $\widehat{q_8}(x) = 16\sigma(x)$ with $\sigma(x) \in \{\pm 1\}$ for every $x \in \F_2^8$.
+A surprising exact parity law ties the full-rank condition directly to the size of $A \cup C$.
+
+\begin{theorem}[Global Rank-$8$ Parity Law]
+\label{thm:rank8-parity}
+Let $(f, g)$ satisfy $\mathrm{hi}(a) \equiv 4 \pmod 8$ and $|\mathrm{hi}(a)| \le 28$ for all $a \in \F_2^8$, and let $k = |A| + |C|$. Then:
+\[
+  \rank(\beta_8) = 8 \quad\Longleftrightarrow\quad k \equiv 1 \pmod 2.
+\]
+\end{theorem}
+\begin{proof}
+Since $q_8(a) H_8(a)$ takes values $1, 5, -3, -7$ on $A, B, C, D$, respectively, summing over $\F_2^8$ gives
+\[
+  T_8 \;:=\; \sum_{a \in \F_2^8} q_8(a) H_8(a) \;=\; a + 5b - 3c - 7(256 - a - b - c) \;=\; -1792 + 8a + 12b + 4c.
+\]
+Using \eqref{eq:total-mass} ($6a + 3b + 5c = 8t - 480$) to eliminate $12b = 32t - 1920 - 24a - 20c$, we obtain
+\begin{equation}
+\label{eq:T8-formula}
+  T_8 \;=\; 32t - 3712 - 16(a + c) \;=\; 16\bigl(2t - 232 - k\bigr).
+\end{equation}
+On the other hand, by Plancherel's identity with $2H_8 = \widehat{U}$,
+\[
+  T_8 \;=\; \frac{1}{2}\sum_{a \in \F_2^8} q_8(a)\widehat{U}(a) \;=\; \frac{1}{2}\sum_{x \in \F_2^8} \widehat{q_8}(x) U(x).
+\]
+If $\rank(\beta_8) = r \le 6$, then $\widehat{q_8}(x) \in \{0, \pm 2^{8 - r/2}\}$ is divisible by $32$ for every $x$, and since $U(x) \in \{0, \pm 1\}$, we obtain $16 \mid \frac{1}{2}\sum_x \widehat{q_8}(x)U(x)$ with quotient $\sum_{x \in R} \sigma(x) U(x) \cdot 2^{3-r/2}$.
+More sharply, since $\sum_x U(x)^2 = 256 - t$ is even (as $t$ is even) and $r \le 6$ forces $32 \mid \widehat{q_8}(x)$ on an affine flat $R$ of size $2^r$, check modulo $32$:
+when $r \le 6$, $T_8/16 = 2^{3-r/2} \sum_{x \in R} \sigma(x) U(x)$ is manifestly \emph{even} whenever $r \le 4$; and for $r = 6$, the $64$-point affine flat $R$ satisfies $\sum_{x \in R} U(x) \equiv \sum_{x \in R} U(x)^2 \equiv 0 \pmod 2$ because $\widehat{U} \equiv 2 \pmod 4$ implies $U$ has even weight on every affine $6$-flat (indeed $\sum_{x \in R} U(x) = \frac{1}{4}\sum_{\omega \in R^\perp} \pm \widehat{U}(\omega)$ is a sum of four numbers $\equiv 2 \pmod 4$, hence divisible by $2$ even after dividing by $4$---proved directly via \code{Balanced242Parity}). Thus $32 \mid T_8$ whenever $r \le 6$, so by \eqref{eq:T8-formula}, $k \equiv 0 \pmod 2$.
+
+Conversely, when $r = 8$, $\widehat{q_8}(x) = 16\sigma(x)$ everywhere with $\sigma(x) \in \{\pm 1\}$, so
+\[
+  T_8/16 \;=\; \frac{1}{2}\sum_{x \in \F_2^8} \sigma(x) U(x).
+\]
+Crucially, for any bent quadratic function $\beta_8$ on $\F_2^8$, its dual sign $\sigma$ is also bent, and reducing $H_8(a) = \frac{1}{2}\widehat{U}(a) \equiv q_8(a) \pmod 4$ modulo $2$ and $4$ shows that $\sum_x \sigma(x)U(x) \equiv 2 \pmod 4$ (see \code{Balanced242Parity.rank\_eq\_8\_iff\_k\_odd}), forcing $T_8/16$ to be odd, hence $k = 2t - 232 - T_8/16 \equiv 1 \pmod 2$.
+\end{proof}
+
+\begin{remark}
+In fact, when $\rank(\beta_8) = 8$, let $N_+ = \#\{x \in \F_2^8 : \sigma(x)U(x) = 1\}$ and $N_- = \#\{x : \sigma(x)U(x) = -1\}$. Since $N_+ + N_- = 256 - t$ and $N_+ - N_- = T_8 / 8 = 2(2t - 232 - k)$, we obtain the exact global exception-site budget
+\begin{equation}
+\label{eq:Nplus}
+  N_+ \;=\; \frac{3t - 208}{2} - (a + c),
+\end{equation}
+formalized as \code{Balanced242Rank8.rank8\_Nplus\_formula}.
+For every hyperplane direction $w \in \F_2^8 \setminus \{0\}$, the two complementary $7$-variable sections satisfy $E(H_0) + E(H_1) \le N_+$ where $E(H_c)$ counts sites with $\sigma_c D_c = +2$ on the $64$-point rank-$6$ support of the section (\code{rank8\_secExc\_sum}).
+\end{remark}
+
+\subsection{The Anchor-Pair $63/64$ Coupled Rank-Splitting Theorem}
+
+Fix any nonzero hyperplane direction $w \in \F_2^8 \setminus \{0\}$ and partition $\F_2^8$ into the two affine hyperplanes $H_0 = \{x : \langle w, x\rangle = 0\}$ and $H_1 = \{x : \langle w, x\rangle = 1\}$.
+When $\beta_8$ has full rank $8$, its restriction to \emph{each} hyperplane $H_c$ has symplectic rank $6$ (since restricting a nondegenerate alternating form on $\F_2^8$ to a codimension-$1$ subspace leaves a $1$-dimensional radical $\langle r_w \rangle$ spanned by the unique $r_w$ with $B(r_w, \cdot) = \langle w, \cdot \rangle$).
+
+Now take any nonzero quotient direction $v \in (\F_2^8 / \langle w \rangle)^* \cong \F_2^7 \setminus \{0\}$.
+Slicing $H_0$ and $H_1$ simultaneously by $v$ cuts $\F_2^8$ into four affine $6$-flats (quarters):
+\[
+  Q_{00}, Q_{01} \subset H_0, \qquad Q_{10}, Q_{11} \subset H_1.
+\]
+The polar form of $\beta_8$ restricted to any one of these four $6$-flats depends \emph{only} on the linear $6$-space $W_{w,v} = \ker(w) \cap \ker(v)$---hence all four quarters share the \emph{exact same} symplectic rank $r(w, v) \in \{4, 6\}$!
+
+\begin{theorem}[Anchor-Pair $63/64$ Rank-Splitting Theorem]
+\label{thm:anchor6364}
+Suppose $\rank(\beta_8) = 8$, and fix any $w \in \F_2^8 \setminus \{0\}$.
+As $v$ ranges over all $127$ nonzero directions of $\F_2^7$, the common symplectic rank $r(w, v)$ of $\beta_8$ on the four quarters $Q_{00}, Q_{01}, Q_{10}, Q_{11}$ satisfies:
+\begin{enumerate}[nosep]
+  \item $r(w, v) \in \{4, 6\}$ for every $v \in \F_2^7 \setminus \{0\}$;
+  \item $r(w, v) = 4$ for \textbf{exactly $63$} directions $v$ (precisely those with $r_w \in \ker(v)$);
+  \item $r(w, v) = 6$ for \textbf{exactly $64$} directions $v$ (precisely those with $r_w \notin \ker(v)$).
+\end{enumerate}
+Moreover, the two complementary halves $H_0, H_1$ are simultaneously coupled to the global surviving split set: for every $v \neq 0$, both paired sums $Q_{00} \sqcup Q_{10}$ and $Q_{00} \sqcup Q_{11}$ are themselves affine hyperplanes of $\F_2^8$.
+\end{theorem}
+\begin{proof}
+Since $B$ is nondegenerate on $\F_2^8$, the map $u \mapsto B(u, \cdot)$ is an isomorphism $\F_2^8 \to (\F_2^8)^*$, so there is a unique nonzero $r_w \in \F_2^8$ with $B(r_w, x) = \langle w, x \rangle$ for all $x$.
+Because $B$ is alternating, $B(r_w, r_w) = 0$, so $r_w \in \ker(w)$ spans the $1$-dimensional radical of $B|_{\ker(w)}$.
+For any $v \in \F_2^7 \setminus \{0\}$ lifted to $\tilde{v} \notin \{0, w\}$, the codimension-$2$ subspace $W = \ker(w) \cap \ker(\tilde{v})$ has $\dim(\mathrm{rad}(B|_W)) \le 2$ (as $\dim W^\perp = 2$).
+Specifically, $W^\perp = \langle r_w, r_{\tilde{v}} \rangle$, so $\mathrm{rad}(B|_W) = W \cap W^\perp$ has dimension $2$ iff $B(r_w, r_{\tilde{v}}) = 0$ (which is equivalent to $\langle \tilde{v}, r_w \rangle = 0$) and dimension $0$ iff $\langle \tilde{v}, r_w \rangle = 1$.
+Since $r_w \in \ker(w) \setminus \{0\}$ represents a nonzero functional on the $7$-dimensional dual quotient $(\F_2^8 / \langle w \rangle)^*$, exactly $2^6 - 1 = 63$ nonzero quotient directions satisfy $\langle \tilde{v}, r_w \rangle = 0$ (giving rank $6 - 2 = 4$) and exactly $2^6 = 64$ satisfy $\langle \tilde{v}, r_w \rangle = 1$ (giving rank $6 - 0 = 6$).
+Finally, $Q_{00} \sqcup Q_{10} = \ker(\tilde{v})$ and $Q_{00} \sqcup Q_{11} = \ker(\tilde{v} \oplus w)$ are both hyperplanes in $\F_2^8$.
+\end{proof}
+
+\subsection{Closed-Form Rank-$6$ Exception-Bucket Bound}
+
+On a $7$-variable rank-$6$ section with class counts $(x, y, z)$, mass $M = 6x + 3y + 5z$, and odd count $k_7 = x + z$, the signed folding table $D : \F_2^7 \to \{-2, -1, 0, 1, 2\}$ satisfies $4\sum D^2 = 784 - M$ and $\sum_{R} \sigma D = T_7/8 = -112 + M/2 - 2k_7$ on the $64$-point affine support $R$ of $\widehat{q_7}$.
+
+\begin{proposition}[Closed-Form Exception Bound \code{eminClosed}]
+\label{prop:emin}
+On a $7$-variable rank-$6$ section with $64$-point support $R = \supp(\widehat{q_7})$, define the six multiplicity buckets
+\[
+  p_j = \#\{u \in R : \sigma(u)D(u) = +j\},\quad
+  n_j = \#\{u \in R : \sigma(u)D(u) = -j\},\quad
+  m_j = \#\{u \notin R : |D(u)| = j\}
+\]
+for $j \in \{1, 2\}$, and define the section exception weight $E := p_1 + 2p_2 + m_2$.
+With $\tau = -112 + M/2 - 2k_7$ and $s = (784 - M)/4$, one has
+\[
+  E \;\ge\; \max\!\left(0,\; \tau,\; \left\lfloor \frac{s + 2\tau - 61}{4} \right\rfloor\right).
+\]
+\end{proposition}
+\begin{proof}
+By definition, $m_1 + m_2 \le |R^c| = 64$, $\tau = p_1 + 2p_2 - n_1 - 2n_2$, and $s = \sum_{u} D(u)^2 = p_1 + 4p_2 + n_1 + 4n_2 + m_1 + 4m_2$.
+Immediately $E = p_1 + 2p_2 + m_2 \ge p_1 + 2p_2 - n_1 - 2n_2 = \tau$.
+Moreover,
+\[
+  s + 2\tau \;=\; 3p_1 + 8p_2 - n_1 + m_1 + 4m_2 \;\le\; 4(p_1 + 2p_2 + m_2) + m_1 \;\le\; 4E + 64,
+\]
+so $4E \ge s + 2\tau - 64$. Since $E$ is an integer, $E \ge \lceil(s + 2\tau - 64)/4\rceil = \lfloor(s + 2\tau - 61)/4\rfloor$.
+\end{proof}
+
+% ============================================================================
+\section{All-Degree Shifted Krawtchouk LP, Barycenter Puncturing, and Coding Bounds}
+\label{sec:krawtchouk}
+% ============================================================================
+
+To refute candidate profiles whose admissible hyperplane splits survive Proposition~\ref{prop:emin} and anchor-pair peeling, we develop three completely general combinatorial engines (all formalized in zero-Mathlib Lean~4 in \code{Balanced242Krawtchouk} and \code{Balanced242Centered}).
+
+\subsection{All-Degree Shifted Multivariate Krawtchouk Inequalities}
+
+For a subset $P \subseteq \F_2^n$ of size $s$ and a direction $w \in \F_2^n$, let $h_P(w) = \#\{x \in P : \langle w, x \rangle = 1\}$ be its hyperplane half-count, and let
+\[
+  K_i^{(s)}(x) \;=\; \sum_{r=0}^{i} (-1)^r \binom{x}{r}\binom{s-x}{i-r}
+\]
+be the binary Krawtchouk polynomial of degree $i$.
+Note that $K_i^{(s)}(h_P(w)) = e_i\bigl(\{\chi_w(x) : x \in P\}\bigr)$ is the $i$-th elementary symmetric polynomial of the characters $\{\chi_w(x)\}_{x \in P}$.
+
+\begin{theorem}[Shifted All-Degree Multivariate Krawtchouk Theorem]
+\label{thm:kraw-shifted}
+Let $P, Q, R \subseteq \F_2^n$ have sizes $a, b, c$, and fix any shift $t \in \F_2^n$ and integers $i, j, \ell \ge 0$. Set
+\[
+  S_{i,j,\ell}(t) \;:=\; \sum_{w \in \F_2^n \setminus \{0\}} \chi_w(t)\, K_i^{(a)}(h_P(w))\, K_j^{(b)}(h_Q(w))\, K_\ell^{(c)}(h_R(w)),
+  \qquad
+  \mathrm{dc}_{i,j,\ell} \;:=\; \binom{a}{i}\binom{b}{j}\binom{c}{\ell}.
+\]
+Then:
+\begin{enumerate}[nosep]
+  \item $S_{i,j,\ell}(t) + \mathrm{dc}_{i,j,\ell} = 2^n \cdot \#\bigl\{(S_1, S_2, S_3) \in \binom{P}{i} \times \binom{Q}{j} \times \binom{R}{\ell} : t \oplus \bigoplus S_1 \oplus \bigoplus S_2 \oplus \bigoplus S_3 = 0\bigr\}$.
+  \item Consequently, $S_{i,j,\ell}(t) \ge -\mathrm{dc}_{i,j,\ell}$ and $S_{i,j,\ell}(t) + \mathrm{dc}_{i,j,\ell} \equiv 0 \pmod{2^n}$.
+  \item \emph{(Degree-$1$ equality)} If $i + j + \ell = 1$ and $t \notin P \cup Q \cup R$, then $S_{i,j,\ell}(t) = -\mathrm{dc}_{i,j,\ell}$.
+  \item \emph{(Unshifted degree-$2$ equality)} If $t = 0$, $i + j + \ell = 2$, and $P, Q, R$ are pairwise disjoint, then $S_{i,j,\ell}(0) = -\mathrm{dc}_{i,j,\ell}$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+Expanding each $K_i^{(a)}(h_P(w)) = \sum_{S_1 \in \binom{P}{i}} \chi_w(\bigoplus S_1)$ and summing over all $w \in \F_2^n$ (including $w = 0$, which contributes $\chi_0(t)\mathrm{dc}_{i,j,\ell} = \mathrm{dc}_{i,j,\ell}$) gives
+\[
+  S_{i,j,\ell}(t) + \mathrm{dc}_{i,j,\ell} = \sum_{S_1, S_2, S_3} \sum_{w \in \F_2^n} \chi_w\!\left(t \oplus \bigoplus S_1 \oplus \bigoplus S_2 \oplus \bigoplus S_3\right),
+\]
+and character orthogonality evaluates the inner sum to $2^n$ if the XOR is $0$ and $0$ otherwise.
+Parts (2)--(4) follow immediately: when $i+j+\ell=1$ and $t \notin P \cup Q \cup R$, no single element equals $t$; when $t=0$, $i+j+\ell=2$, and $P,Q,R$ are pairwise disjoint, no pair of distinct elements has XOR equal to $0$.
+\end{proof}
+
+\subsection{$\F_2$-Barycenter Translation and Marker-Center Puncturing}
+\label{sec:barycenter}
+
+Unshifted Krawtchouk inequalities are invariant under global translation $x \mapsto x \oplus s$.
+However, when a partition $P_0 \sqcup P_1 \sqcup P_2 \sqcup P_3 = \F_2^8$ has at least one \emph{odd-sized} class $P_{i_a}$, we can break translation symmetry canonically using the $\F_2$-barycenter
+\[
+  \mathrm{bar}(P) \;:=\; \bigoplus_{x \in P} x \;\in\; \F_2^n.
+\]
+
+\begin{theorem}[Barycenter Parity and Marker-Center Laws]
+\label{thm:barycenter}
+Let $P, Q \subseteq \F_2^n$ with $|P|$ odd.
+\begin{enumerate}[nosep]
+  \item For every $w \in \F_2^n$, $h_P(w) \equiv \langle w, \mathrm{bar}(P) \rangle \pmod 2$.
+  \item Translating by $s = \mathrm{bar}(P)$ produces $P' = P \oplus s$ satisfying $h_{P'}(w) \equiv 0 \pmod 2$ for \textbf{every} $w \in \F_2^n$.
+  \item Let $Q' = Q \oplus s$ and set the marker $q_b = \mathrm{bar}(Q')$. Then for every $w \in \F_2^n$, the parity bit $\mathrm{cut}(w) := h_{Q'}(w) \bmod 2$ equals $\langle w, q_b \rangle$, so $\chi_w(q_b) = 1 - 2\,\mathrm{cut}(w)$.
+  \item If $q_b \neq 0$, then $\sum_{w \in \F_2^n \setminus \{0\}} \mathrm{cut}(w) = 2^{n-1}$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+Part (1) follows from $\langle w, \bigoplus_{x \in P} x \rangle = \bigoplus_{x \in P} \langle w, x \rangle = h_P(w) \bmod 2$.
+Under translation by $s$, $h_{P'}(w) = h_P(w)$ if $\langle w, s \rangle = 0$ and $|P| - h_P(w)$ if $\langle w, s \rangle = 1$. Since $|P|$ is odd and $h_P(w) \equiv \langle w, s \rangle \pmod 2$, both cases yield $h_{P'}(w)$ even, proving (2).
+Part (3) applies (1) to $Q'$, and (4) follows from $\sum_{w \neq 0} (1 - 2\langle w, q_b \rangle) = \sum_{w} \chi_w(q_b) - 1 = -1$.
+\end{proof}
+
+Now puncture $\{0, q_b\}$ from whichever classes contain them (splitting over at most $16$ non-coinciding cases $q_b \neq 0$ and $4$ coinciding cases $q_b = 0$). The punctured classes $(Q_0, Q_1, Q_2)$ are pairwise disjoint and avoid both $0$ and $q_b$, so Theorem~\ref{thm:kraw-shifted} applies simultaneously at $t = 0$ (unshifted rows) and at $t = q_b$ (shifted rows multiplied by $1 - 2\,\mathrm{cut}(w)$), with degree-$1$ equalities holding for \emph{both} $t = 0$ and $t = q_b$!
+
+\subsection{Residual Kernel Coupling, Griesmer Bound, and $[24, 8, \ge 10]_2$ Non-Existence}
+\label{sec:coding}
+
+For origin-pinned profiles with $a \ge 1$, translating by a point $x_0 \in A$ and puncturing $0$ from $A'$ reduces the sizes to $(a-1, b, c)$ with $0 \notin A' \cup B' \cup C'$.
+When $a = 1$ (such as $(1, 54, 24)$ at $t = 96$), $A' = \emptyset$ and any nonzero direction $u \in \F_2^8 \setminus \{0\}$ allows us to restrict $(B', C')$ to the $7$-dimensional kernel $\ker(u) = \{y : \langle u, y \rangle = 0\}$.
+
+\begin{lemma}[Residual Kernel Coupling]
+\label{lem:residual}
+For any $P \subseteq \F_2^n$ and $u, v \in \F_2^n$, let $P_{\ker(u)} = P \cap \ker(u)$. Then
+\[
+  2\, h_{P_{\ker(u)}}(v) + h_P(u) \;=\; h_P(v) + h_P(v \oplus u),
+  \qquad
+  \bigl|h_P(v) - h_P(v \oplus u)\bigr| \;\le\; h_P(u).
+\]
+\end{lemma}
+\begin{proof}
+Check the indicator identity $2\,\ind_{P \cap \ker(u)}(y)\langle v, y \rangle + \ind_P(y)\langle u, y \rangle = \ind_P(y)(\langle v, y\rangle + \langle v \oplus u, y\rangle)$ and $|\langle v, y \rangle - \langle v \oplus u, y\rangle| \le \langle u, y \rangle$ pointwise on all $8$ truth values of $(\ind_P(y), \langle u, y\rangle, \langle v, y\rangle)$, then sum over $y \in \F_2^n$.
+\end{proof}
+
+Treating the support of $C'$ as the columns of an $8 \times c$ generator matrix of a binary linear code (so codeword weights are $h_{C'}(v)$), we invoke two classical coding bounds---both proved constructively from scratch in \code{Balanced242Centered}:
+
+\begin{theorem}[Binary Griesmer Bound, Sphere-Packing Bound, and Non-Existence of {$[24, 8, \ge 10]_2$}]
+\label{thm:code24}
+For any list of columns $\mathcal{C} \subset \F_2^k$ with minimum nonzero codeword weight $\ge d$:
+\begin{enumerate}[nosep]
+  \item \emph{(Griesmer bound)} $|\mathcal{C}| \ge g(k, d) := \sum_{i=0}^{k-1} \lceil d / 2^i \rceil$.
+  \item \emph{(Hamming bound for $d \ge 3$)} If $d \ge 3$, then $2^k (1 + |\mathcal{C}|) \le 2^{|\mathcal{C}|}$.
+  \item \emph{(Corollary for $k = 8, |\mathcal{C}| = 24$)} No binary linear code of length $24$, dimension $8$, and minimum distance $\ge 10$ exists.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+(1) Induct on $k$: choose $u \neq 0$ achieving minimum weight $d_0 \ge d$, and project $\mathcal{C} \cap \ker(u)$ to $\F_2^{k-1}$ by dropping a coordinate where $u_i = 1$. By Lemma~\ref{lem:residual}, every nonzero codeword of the residual code has weight $\ge \lceil d_0 / 2 \rceil$, giving $|\mathcal{C}| = d_0 + |\mathcal{C}_{\mathrm{res}}| \ge d_0 + g(k-1, \lceil d_0/2\rceil) = g(k, d_0) \ge g(k, d)$.
+(2) The Hamming balls of radius $1$ around the $2^k$ distinct codewords in $\F_2^{|\mathcal{C}|}$ are pairwise disjoint by the triangle inequality, giving $2^k(1 + |\mathcal{C}|) \le 2^{|\mathcal{C}|}$.
+(3) Suppose $\mathcal{C} \subset \F_2^8$ has $|\mathcal{C}| = 24$ and minimum distance $\ge 10$. Since $g(8, 11) = 26 > 24$, there must exist a word of weight exactly $10$. Its residual is a $[14, 7, \ge 5]_2$ code. Since $g(7, 6) = 15 > 14$, that residual must contain a word of weight exactly $5$. Its second residual is a $[9, 6, \ge 3]_2$ code, contradicting (2) since $2^6(1 + 9) = 640 > 512 = 2^9$.
+\end{proof}
+
+% ============================================================================
+\section{Unconditional Structural Exclusions at $t = 96$ and $t = 98$}
+\label{sec:t9698}
+% ============================================================================
+
+We highlight two frontier arguments, at $t = 96$ and $t = 98$, whose algebraic obstructions are verified in Lean~4 without \code{SectionEnum}.
+
+\subsection{Impossibility of $t = 98$, Global Rank $6$, $|Z| = 144$}
+
+When $t = 98$ and $\rank(\beta_8) = 6$, the high-block phase transform $\widehat{q_8}$ is supported on a $64$-point affine $6$-flat $R$ with magnitude $32$, and $U$ is supported on $256 - 98 = 158$ sites.
+Let $Z = \{a \in \F_2^8 : \mathrm{lo}(a) \equiv 0 \pmod{16}\}$; in the case $|Z| = 144$, the agreement table $V$ and disagreement table $U$ interact on the four $6$-flat cosets of $R$.
+
+\begin{theorem}[Unconditional Exclusion of $t = 98$, Rank $6$, $|Z| = 144$]
+\label{thm:t98-r6-z144}
+No balanced $9$-variable Boolean function of nonlinearity $242$ can have adapted half-agreement count $t = 98$, global phase rank $\rank(\beta_8) = 6$, and $|Z| = 144$.
+\end{theorem}
+\begin{proof}[Proof outline]
+In coordinates $(b_0,b_1,c)\in\F_2^2\times\F_2^6$, the normal form has $\widehat V(b_0,b_1,c)\equiv 4Q_6(c)\pmod 8$ for a weight-$28$ bent function $Q_6$. The Lean lemma \code{no\_t98\_r6\_z144} takes this residue pattern as a hypothesis. In the coordinate-free master theorem, \code{t98\_remaining} covers all six surviving values of $|Z|$, including $144$.
+Write $K = R^\perp$ ($\dim K = 2$) and index the four cosets of $R$ in $\F_2^8$ by $x \in \F_2^2$.
+\begin{enumerate}[nosep]
+  \item From $\mathrm{lo} = 2\widehat{V}$ and $|Z| = 144$, Parseval and divisibility on the four cosets determine the signed fiber counts of $V$ and $U$ across $R$, yielding four $6$-variable indicators $p_0, p_1, p_2, p_3 : \F_2^6 \to \F_2$ whose supports partition a $28$-point subset $C \subset \F_2^6$ into fibers $F_0, F_1, F_2, F_3$ of sizes $a_0 + a_1 + a_2 + a_3 = 28$.
+  \item For every pair $i \neq j$, the pairwise XOR $p_i \oplus p_j = \ind_{F_i \sqcup F_j}$ has third-difference Walsh transform divisible by $4$, hence is a quadratic Boolean function in $\mathrm{RM}(2, 6)$.
+  \item By the exact weight classification of $\mathrm{RM}(2, 6)$ (\code{rm2\_6\_weight}), every quadratic Boolean function on $\F_2^6$ has Hamming weight in $\{0, 16, 24, 28, 32, 36, 40, 48, 64\}$.
+  \item Since all six pairwise sums $a_i + a_j \le 28$ must lie in $\{0, 16, 24, 28\}$ while $(a_0 + a_1) + (a_2 + a_3) = 28$, elementary case analysis forces three of the $a_i$ to be $0$ and one to be $28$!
+  \item Consequently $\ind_C = p_{x^*} \in \mathrm{RM}(2, 6)$ is itself a weight-$28$ quadratic function on $\F_2^6$. Every weight-$28$ function in $\mathrm{RM}(2, 6)$ is bent (up to affine equivalence), forcing its Walsh transform to take only values $\pm 8$. Matching this against the forced $\pm 4, \pm 12$ Walsh spectrum on the remaining cosets yields an immediate contradiction. \qedhere
+\end{enumerate}
+\end{proof}
+
+\begin{remark}[Subtlety caught during formalization]
+An informal draft of Step~3 attempted to isolate a single fiber indicator $\ind_{F_x}$ via linear combinations of $p_0, \dots, p_3$. During Lean~4 formalization, it emerged that only the \emph{pairwise} XORs $p_i \oplus p_j = \ind_{F_i \sqcup F_j}$ are directly guaranteed to lie in $\mathrm{RM}(2, 6)$. The arithmetic observation in Step~4 (using $(a_0+a_1)+(a_2+a_3)=28$ and $\{0, 16, 24, 28\}$) closes the proof rigorously without needing individual $p_x \in \mathrm{RM}(2, 6)$ a priori.
+\end{remark}
+
+\subsection{Exact Walsh $\bmod\;16$ Energy Dichotomy for $t = 96$, $(0, 31, 39)$}
+
+\begin{theorem}[Spectral Dichotomy for $t = 96$, Rank $8$, Profile $(0, 31, 39)$]
+\label{thm:t96-03139}
+Let $(f, g)$ be an adapted pair with $t = 96$ and global profile $(a, b, c) = (0, 31, 39)$, and define $f_{BC} = \ind_B - \ind_C : \F_2^8 \to \{-1, 0, 1\}$. Then:
+\begin{enumerate}[nosep]
+  \item For every $w \in \F_2^8$, $\widehat{f_{BC}}(w) \equiv 8 \pmod{16}$, $\widehat{f_{BC}}(0) = -8$, and $\sum_{w \in \F_2^8} (\widehat{f_{BC}}(w)^2 - 64) = 1536$.
+  \item $|\widehat{f_{BC}}(w)| \le 40$ for all $w \in \F_2^8$, and exactly one of the following holds:
+  \begin{itemize}[nosep]
+    \item \emph{(Single-$40$ branch)} There is a unique $w \neq 0$ with $|\widehat{f_{BC}}(w)| = 40$ (and $|\widehat{f_{BC}}(v)| = 8$ for all $v \neq w$), and one side of $w$ automatically has $c \le 16$ and $|2(b-c)+8| = 40$.
+    \item \emph{(Three-$24$ branch)} $|\widehat{f_{BC}}(w)| \le 24$ for all $w \in \F_2^8$ (with exactly three $w$ attaining $24$), and Parseval on $\ind_C$ alone forces a nonzero hyperplane with a side having $c \le 16$ and $|2(b-c)+8| \le 24$.
+  \end{itemize}
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+For every hyperplane $w \neq 0$, the section mass $6a' + 3b' + 5c' = 3b' + 5c' \equiv 0 \pmod 8$ implies $3(b' - c') \equiv 0 \pmod 8$, hence $b' \equiv c' \pmod 8$.
+Thus $\widehat{f_{BC}}(w) = (31 - 2b') - (39 - 2c') = -8 - 2(b' - c') \equiv 8 \pmod{16}$.
+By Parseval, $\sum_w \widehat{f_{BC}}(w)^2 = 256(|B| + |C|) = 256 \cdot 70$, so $\sum_w (\widehat{f_{BC}}(w)^2 - 64) = 256 \cdot 6 = 1536$.
+Since every term is $\ge 0$ and the possible excess values $W^2 - 64$ for $|W| \in \{8, 24, 40, 56, \dots\}$ are $0, 512, 1536, 3072, \dots$, no $|W| \ge 56$ can occur, and either a single $40$ consumes the entire excess $1536$ or three $24$s do.
+In the single-$40$ branch, $b' - c' \in \{16, -24\}$ with $0 \le b' \le 31$ forces $c' \le 15$ or $39 - c' \le 15$.
+In the cap-$24$ branch, Parseval on $\ind_C$ gives $\sum_{w \neq 0} \widehat{\ind_C}(w)^2 = 256 \cdot 39 - 39^2 = 8463 > 255 \cdot 25$, forcing some $w \neq 0$ with $|39 - 2c'| \ge 7$, i.e., $\min(c', 39 - c') \le 16$.
+\end{proof}
+
+% ============================================================================
+\section{Certificate-Driven Exclusions: $t \le 94$ and $t = 96$ Frontier}
+\label{sec:exclusions}
+% ============================================================================
+
+Combining Sections~\ref{sec:phase-geometry} and~\ref{sec:krawtchouk} yields a fully mechanized refutation pipeline inside Lean~4:
+
+\begin{theorem}[Exclusion of All $t \le 94$ and Autocorrelation Lower Bound $\Delta_F \ge -128$]
+\label{thm:t94}
+Assume \code{SectionEnumE excl6MaskT94 eBoundsT94}, which records $252$ distinct excluded rank-$6$ section profiles and $59$ exception lower bounds.
+\begin{enumerate}[nosep]
+  \item All $17$ remaining rank-$8$ frontier profiles at $t = 94$ are excluded in the Lean~4 kernel: $15$ directly via sparse all-degree Krawtchouk Farkas certificates (\code{Balanced242T94Direct}) and the remaining $2$---$(12, 25, 25)$ ($108$ anchors) and $(15, 24, 22)$ ($97$ anchors)---via $1$-layer anchor-pair peeling (\code{Balanced242T94Layered}).
+  \item Assume also \code{SectionEnum} for $t\le92$ and \code{ComputationalClosures.t94\_nonfrontier} for the other $t=94$ profiles. Then any balanced $F$ of nonlinearity $242$ has $t\ge96$ on its adapted half-split. In its canonical direction $a$, $2t\ge192$ inputs satisfy $F(x)=F(x+a)$, and $\Delta_F(a)=4t-512\ge-128$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Kernel-Verified $t = 96$ Rank-$8$ Profile Exclusions]
+\label{thm:t96-profiles}
+The following $t = 96$ rank-$8$ profiles are formally excluded in the Lean~4 kernel:
+\begin{enumerate}[nosep]
+  \item $(96, 21, 34, 12, 8)$ via direct sparse Krawtchouk Farkas (\code{Balanced242T94.t96\_21\_34\_12\_excluded}).
+  \item $(96, 2, 47, 27, 8)$ via $10$ layer-$0$ anchor-pair certificates and a $10$-term origin-pinned centered Krawtchouk Farkas certificate (\code{Balanced242T96Centered.excl\_96\_2\_47\_27}), modulo \code{SectionEnumE excl6MaskT96 eBoundsT96} and non-occurrence of the single flag leaf $(0, 26, 10)$.
+  \item $(96, 1, 54, 24, 8)$ via $20$ layer-$0$ anchor-pair certificates, two $8$-term $7$-dimensional residual Krawtchouk certificates for $(0, 46, 6)$ and $(0, 48, 8)$, and Theorem~\ref{thm:code24}(3) (\code{Balanced242T96Centered.excl\_96\_1\_54\_24}), modulo \code{SectionEnumE excl6MaskT96 eBoundsT96} and non-occurrence of the three flag leaves $(0,44,4), (0,38,6), (0,40,8)$.
+  \item $(96, 0, 51, 27, 8)$ (the second $b + c = 78$ profile at $t = 96$) via the unconditional mod-$4$ barycenter parity law (\code{Balanced242T96Quartic.\allowbreak rank8\_a0\_far\_yz\_div4}) and three tiny integer Farkas certificates of $6, 5, 5$ terms (\code{Balanced242T96\_0\_51\_27}), using zero flag leaves and zero anchor peeling.
+\end{enumerate}
+\end{theorem}
+
+\subsection{Complete Closure of $t = 96$, $t = 98$, $t = 100$, $t = 102$, and $t \ge 104$}
+\label{sec:complete-closure}
+
+To close the remaining agreement window $t \in [96, 128]$, two complementary verification engines meet cleanly at the midpoint seam $t = 98 \mid t = 100$:
+
+\paragraph{1. Bottom-up high-block quartic closure ($t = 96$ and $t = 98$).}
+The rank-$8$ high-block inversion $2KD = 28 - 3S + 32u$, ternary counts $2p = 3t - 208 - 2(a+c)$, first-moment identity $\langle u, S \rangle = 10(b+c) - 16c$, three hinge lower bounds $(h,l) \in \{(14,6),(18,6),(18,10)\}$, and exact integer dual-cut soundness are all formalized unconditionally in \code{Balanced242QuarticHighBlock} (using only \code{[propext, Quot.sound]}).
+\begin{itemize}[nosep]
+  \item \textbf{$t = 96$:} Packaged separately in \code{nl242\_t96\_closure.zip}. All $55$ rank-$8$ profiles through $b+c = 78$ are excluded by the four-cell quartic enumerator (\code{verify\_t96\_quartic.py} with \code{hinge\_t.cpp}), with $0$ survivors across every weight $46, 50, \dots, 78$; the last weight alone checks $106{,}366{,}593$ configurations. The run reads the SHA-256-checked $6$-dimensional core tables \code{shapes\{8,10,12,14,16\}.bin} and \code{radial\_cuts.txt} from the $t = 98$ packet. An independent baseline enumerator (\code{quartic\_sections\_t.cpp}) agrees on weights $46$--$74$. The centered closures of Theorem~\ref{thm:t96-profiles} (Layer~B) give a second route for four of the profiles. No rank-$6$ or rank-$\le 4$ cases remain at $t = 96$.
+  \item \textbf{$t = 98$:} Packaged in \code{nl242\_t98\_closure.zip} with full SHA-256 verification. After v2 certificate replay ($22$ rank-$6$ and $102$ rank-$8$ profiles), all $22$ rank-$6$ profiles are excluded (including the normal-form obstruction of Theorem~\ref{thm:t98-r6-z144}) and $18$ rank-$8$ profiles close via frontier/anchor/pin/centered obstructions. The remaining $84$ rank-$8$ quartic profiles split into $70$ at $b+c \le 74$, $10$ at $b+c = 78$ ($945{,}849{,}169$ four-cell configurations; $9{,}245$ passing the three hinges), and $4$ at $b+c = 82$ ($19{,}404{,}895{,}597$ four-cell configurations; $2{,}006$ passing the three hinges). Every single surviving support/profile pair ($92{,}450$ at weight~$78$ and $8{,}024$ at weight~$82$) is strictly refuted in exact arbitrary-precision integer arithmetic (\code{direct.py}), all $59$ AVX-512 jobs agree byte-for-byte with $36$ scalar reference jobs (\code{coverage.py}), and an independent $2^{21}$-character Fourier mass calculation (\code{orbit\_mass.py}) confirms $100\%$ orbit completeness of the affine-symplectic $6$-dimensional cores at every size $m \in \{8, 10, 12, 14, 16, 18\}$ ($1, 1, 3, 7, 23, 65$ inequivalent cores matching $2{,}304$ through $1{,}717{,}438{,}464$ labeled admissible sets).
+\end{itemize}
+
+\paragraph{2. Top-down low-block closure ($t = 100$, $t = 102$, and $t \ge 104$).}
+Packaged in \code{nl242\_top\_closure.zip} ($104$ files, all paths relative, SHA-256 manifest), together with \code{nl242\_middle\_closure.zip} for the middle window ($t = 104$--$108$).
+The universal low-block defect budget $4(n_0 + 2n_8) = 2304 - 5|Z| - 16t$, autocorrelation congruence $\bmod\;32$, and all upper-window budget exclusions are formalized unconditionally in \code{Balanced242LowBlock}.
+\begin{itemize}[nosep]
+  \item \textbf{$t \ge 104$:}
+    For $t \ge 114$, \code{Balanced242LowBlock.t\_ge\_114\_forces\_Z64} forces $|Z| = 64$ (rank~$2$).
+    $t = 118$ is unconditionally closed in Lean (\code{Balanced242T118.no\_t118}, low-block only, via kernel-verified RREF affine-subspace cuts and empty-cell integer rounding, formalizing \code{check\_t118.py}; also confirmed by \code{verify\_spread\_t118\_all127.c}), and $t \ge 120$ is unconditionally closed in \code{Balanced242Endpoint.low\_agreements\_below\_120}.
+    At $t = 114$, the $[12,9,4]$ Hamming sphere-packing contradiction ($512 \cdot 13 = 6{,}656 > 4{,}096$) closes $t = 114$ \emph{unconditionally} in Lean (\code{Balanced242T114.no\_t114}), and the same argument unconditionally excludes $k = 12$ at $t = 116$ (\code{Balanced242T114.t116\_forces\_k16}), shrinking the entire endpoint residual to the single case $t = 116, k = 16$ (closed directly in Section~\ref{sec:direct-endpoints} and independently via $\rho(1,9) < 244$ in Section~\ref{sec:nl244}).
+    For $t \le 112$, rank~$2$ ($|Z| = 64$) is unconditionally impossible in Lean (\code{no\_Z64\_of\_t\_le\_112}).
+    At $t = 112$, all ranks are unconditionally closed in Lean (\code{Balanced242T112.no\_t112}, pure algebra + $729$-cell butterfly FWHT check, zero LP, zero covering radius; independently confirmed by \code{verify\_t112\_closed.py});
+    $t = 110$ is closed at ranks $0,2,6,8$ unconditionally in Lean (with $n_0 \ge 8$ proved for rank~$4$ $|Z|=96$ in \code{Balanced242T112.rank4\_Z96\_n0\_ge8}) and at rank~$4$ by pure-integer Farkas certificates (\code{verify\_t110\_closed.py});
+    $t = 108$ is excluded at every rank in \code{nl242\_middle\_closure.zip} (\code{MIDDLE\_PROOF.md}). Rank~$8$ is unconditionally closed for all $t \ge 104$ in Lean (\code{Balanced242T104R8.no\_rank8\_of\_t\_ge\_104}). Rank~$6$ ($|Z| = 112$) fails the four-cell energy bound $36 \cdot 12^2 = 5{,}184 > 4{,}096$; it is also closed matrix-free in Lean (\code{Balanced242T108R6}) via quadratic weight gaps on $\F_2^8$ forcing $144^2 = 20{,}736 > 16{,}384$. Rank~$4$ leaves $9$ profiles after the two high-block tests, and exhaustive reconstruction with $12$, $14$ and $16$ small masks (\code{reconstruct\_108.cpp}, \code{transversal\_108.py}, \code{transversal\_direct.cpp}) finds no high-block completion. The same packet excludes ranks $4$ and $8$ at $t = 104, 106$ and rank~$6$ at $t = 106$ (\code{RANK6\_106.md});
+    rank~$8$ at $t = 104, 106$ is unconditionally closed in Lean (\code{Balanced242T104R8.no\_rank8\_of\_t\_ge\_104}, \code{Balanced242LowBlock.no\_t106\_rank8}), rank~$6$ at $t = 106$ in \code{verify\_t106\_closed.py},
+    and rank~$4,6$ at $t = 104$ in \code{verify\_t104\_closed.\{cpp,py\}}.
+  \item \textbf{$t = 102$:}
+    Rank~$\le 4$ has $0$ open systems; rank~$8$ ($|Z|=120, n_0+2n_8=18$) is completely closed from scratch by the standalone exact-integer verifier \code{verify\_t102\_r8\_closed.cpp} (identifying $\mathrm{QR}(17)$ uniquely at $n_0=18$ and killing all $512$ high-block phases); rank~$6$ $|Z|=128$ is closed by \code{verify\_t102\_z128\_closed.py}; and rank~$6$ $|Z|=112$ is closed across all $2{,}984$ orbits via Mod-$16$ Radical Separation plus the Mod-$3$ Coupled Cell Bound on the sole surviving $512$-element low-block family (\code{t102/z112/}).
+  \item \textbf{$t = 100$:}
+    Rank~$\le 4$ is closed by hand in \code{t100.tex} (Section~3); rank~$6$ $|Z|=144$ has negative defect budget ($-4$); rank~$6$ $|Z|=128$ ($|D|=16$) and $|Z|=112$ ($|D|=36$) are completely reduced and closed in the companion proof \code{t100.tex} (Section~5, closing Branches~II-B2, II-B3 and $(h,p)=(0,0)$ by hand and proving the Branch~I weight-$16$ $64\times$ normalization and $22$-bit degree-$4$--$6$ subcube syndrome in Lemma~5.2), backed inside \code{nl242\_top\_closure.zip} (and mirrored in \code{t100\_r6\_audit/}) by the $10$ branch solvers in \code{t100/z128/} plus the three standalone audit verifiers \code{t100/z128/verify\_z128\_reductions.cpp} ($0.21\,\mathrm{s}$, all $288$ local identities and all orbit lists regenerated), \code{t100/z112/check\_small\_masks.cpp} ($8\,\mathrm{s}$, $9\le k\le 15$), and \code{t100/z112/verify\_z112\_all45\_exact.cpp} ($24.9\,\mathrm{s}$, all $45$ pairs $(h,p)$, $111/111$ live cases killed, $7/7$ positive controls passing, closing three omissions found in the legacy \code{t100/z112/} scripts); rank~$8$ $|Z|=136$ forces $n_0 \le 6 < 10$.
+    For the flagship rank-$8$ $|Z|=120$ case ($n_0 + 2n_8 = 26$, $Q_8^-$ self-dual):
+    \begin{enumerate}[nosep]
+      \item \emph{Exact rational $H_{64}\ w \ge 6$:} Since $\rank(\mathrm{RM}(3,7)|_{Z_{64}}) = 56$ ($\mathrm{quotient\_dim}=0$), $H_{64}\ w=2$ has $0/2{,}016$ valid pairs and $H_{64}\ w=4$ has $5{,}376$ valid $4$-sets in two $\mathrm{Stab}_{O^-(8,2)}(e_7)$-orbits ($3{,}456$ and $1{,}920$), both certified in exact \code{fractions.Fraction} LP dual arithmetic ($\text{den} \le 128$) to force $n_8^{(1)} \ge 8 > 7$ (\code{verify\_h64\_w\_ge\_6\_exact.py}). No $H_{56}$ orbit is ever excluded by single-$g$ LPs because $\mathrm{quotient\_dim}(H_{56}) = 8$.
+      \item \emph{Exact rational Signed $(Q^*, v)$-Weighted Delsarte Farkas certificates:} Using only $H_{64}\ w \ge 6$ and $w(y) \equiv 2(Q^*(y) \oplus \langle y, v\rangle) \pmod 4$, all $11/11$ required $d_{\mathrm{aff}}$ exclusions across $n_0 \in \{18, 20, 22, 24, 26\}$ are certified in exact \code{Fraction} arithmetic (\code{verify\_delsarte\_farkas\_exact.py}, passing the $\mathrm{QR}(17)$ feasibility positive control).
+      \item \emph{Small $n_0 \le 16$ and $n_0 = 18$ ($v = 0$):} $n_0 \le 12$ is closed algebraically / via \code{verify\_t102\_r8\_closed.cpp}; all $32/32$ codes at $n_0 = 14$ and all $4{,}124/4{,}124$ unique RREF reps at $n_0 = 16$ are individually killed by exact integer dual witnesses with margin $\ge +160$ (\code{audit\_n14\_n16\_exact.cpp}); at $n_0 = 18, v=0$, the unique code $\mathrm{QR}(17)$ has all $53{,}550$ XOR-$0$ $4$-subsets $S_8 \subset F$ eliminated (\code{verify\_qr17\_t100\_standalone.cpp}, $t=102$ positive control recovering the real low block $V$).
+      \item \emph{Exact $O^-(8,2)$ orbit reduction + rational $L_1 + L_\infty$ duals ($n_0 = 18\ (v\neq 0)$ and $n_0 = 20$):} Explicit $256$-point verified $O^-(8,2)$ isomorphism matrices reduce all $912$ codes at $n_0 = 18$ ($v \neq 0$) to $5$ exact orbits and all $109{,}846$ codes at $n_0 = 20$ to $342$ exact orbits (\code{audit\_n18\_n20\_exact\_orbits.cpp}); all $347/347$ exact orbits are certified dead in exact \code{Fraction} arithmetic ($224$ plain-infeasible Farkas + $123$ $L_1$ duals with $\min L_1 \ge 6{,}560 > 6{,}400$, \code{certify\_exact\_o8\_orbs\_L1.py}, passing the $\mathrm{QR}(17)$ positive control $\min L_1 = 6{,}528 = 64 \cdot 102$).
+      \item \emph{Zero-LP exact $\mathrm{RM}(3,8)$ $\bmod\;8$ $y_Z$ enumeration ($n_0 = 22, 24, 26$):} Since $\rank(\mathrm{RM}(3,8)|_Z) = 84$, Poisson summation on the $93$ monomials of $\mathrm{RM}(3,8)$ collapses the sign vector $y_Z$ on $Z \setminus Z_0$ to $\le 2^{15}$ exact candidates. At $n_0 = 26$ ($n_8 = 0$), all $1{,}413{,}762$ valid codes across $H_{64}\ w=8$ ($62$ exact orbits), $H_{56}\ w=6$ ($10$ orbits), and $H_{56}\ w=2$ yield \code{REAL\_V = 0} ($\mathrm{QR}(17)$ positive control recovers $12/12$ and $4/4$ real $V$'s). At $n_0 = 24$ ($n_8 = 1, Q(v)=1$), all $12{,}318{,}368$ valid codes yield \code{REAL\_V = 0} (\code{solve\_n24\_exact.cpp}). At $n_0 = 22$ ($n_8 = 2, v \neq 0$), all $1{,}267{,}047$ valid codes reduce via explicit $256$-point verified $O^-(8,2)$ isomorphisms to $8{,}655$ exact orbits, and exact testing of all $36$ pairs $S_8 = \{f_1, f_1 \oplus v\} \subset F$ per orbit ($311{,}580$ pairs) plus $\le 2^{15}$ $y_Z$ enumeration yields \code{REAL\_V = 0} (\code{solve\_n22\_o8\_exact.cpp}).
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Direct exclusion of the switched endpoints}
+\label{sec:direct-endpoints}
+
+At $t=114,116$, the plane switch gives complementary ternary tables $u,v$ on $\F_2^8$ with $|W_u|,|W_v|\in\{4,12\}$. For $E=\{a:|W_u(a)|=4\}$, put $k=|E|$. At $t=114$ one has $k=12$. At $t=116$ one has $k=12$ or $16$. The Lean theorem \code{reduce\_to\_endpoint\_pair} gives the reduction, including the Walsh levels and counts.
+
+Every affine hyperplane contains at least four members of $E$ by the halfspace count applied to $u$ and its character multiples. Moreover, if $m=|\{a\in E:a\cdot d=1\}|$ for $d\ne0$, then $\sum_x u(x)u(x+d)=m-k/2$ by inversion of $W_u^2$. Pairing $x,x+d$ shows that $m$ is even. Restricting affine functions to $E$ therefore gives an even $[k,9,\ge4]$ code $C$ containing the all-one word. At $k=12$, disjoint radius-one balls would occupy $512\cdot13>2^{12}$ points.
+
+At $k=16$, choose a generator of $C^\perp$ with first row all ones. Its columns $(1,x)$ give sixteen distinct spanning points in $\F_2^6$ with vector sum zero. Enumeration up to affine equivalence gives 89 geometries. Their orbit sizes sum to $7{,}630{,}875{,}426{,}048$, also obtained by counting zero-sum sets by affine span. In 64 geometries the dual has minimum distance at least four, as required by distinctness of the original frequencies. For each of their 128 affine sign cosets, Walsh inversion modulo three determines $u$ from the signed small frequencies. Checking the full high spectrum leaves five sign cosets on two geometries. An explicit affine map identifies the three-signing geometry with the Gold graph $\{(x,x^3):x\in\F_{16}\}$. The other exceptional set contains eight affine planes, whereas the graph contains none.
+
+Let $L=\{u=0\}$, of size 120. For $h=u,v$, write $p_h=(W_h-4)/8\bmod2$. The cubic coefficients of $p_h$ are the third incidence moments of $\mathrm{supp}(h)$ modulo two, and all higher coefficients vanish. Complementarity gives $p_v=p_u+Q$ for some quadratic or lower-degree $Q$. Parseval gives 48 low coefficients of magnitude four. Hence $b=(-1)^{p_u+Q}$ must satisfy
+\[
+  \sum_{x\in L} v(x)W_b(x)=4\cdot48-12\cdot208=-2304.
+\]
+For two of the five high sign cosets, the maximum of $\sum_{x\in L}|W_b(x)|$ over $Q$ is 2272. For each of the other three, the maximum is 2304. Each of the 320 equality cases per coset, modulo frequency translations and overall sign, forces all 120 signs of $v$ and gives Walsh peak 28, exceeding 12. This excludes the final profile. The derivation, orbit-mass calculation and exact source replay are included in \code{nl242\_endpoint\_closure.zip}.
+
+A cross-check packet, \code{nl242\_endpoint\_crosscheck.zip}, repeats the $k=16$ calculation with separate code. It parametrises the geometry by balanced cubic functions on $\F_2^5$ with Walsh magnitudes in $\{0,8,16\}$. These fall into eight affine classes and give $70$ admissible lifts. The packet keeps all $70$ lifts instead of merging equivalent ones, and scores every $Q$ by direct Walsh transforms. It does so over all $2^{28}$ quadratic parts for one lift of each class, and modulo frequency translations for the rest. It finds the same two classes and the same maxima $2272$ and $2304$. It also finds the same $320\cdot256=81{,}920$ equality cases, each with Walsh peak $28$.
+
+\subsection{Independent Verification of $\rho(1,9) < 244$}
+\label{sec:nl244}
+
+The plane switch at $t = 114, 116$ also produces an \emph{unbalanced} function with all Walsh values in $\{\pm 8, \pm 24\}$. Thus the unrestricted exclusion at nonlinearity $244$ gives a second proof of these cases.
+Wang, Lou, and Wang~\cite{WLW2026} give an argument for this in a recent preprint.
+We credit them for the argument, but we do not rely on their claims: we re-verified every step ourselves (\code{nl244\_verify.zip}).
+\begin{enumerate}[nosep]
+  \item \emph{Hand steps, re-checked.} An NL-$244$ function $f$ has $W_f \in \{\pm 8, \pm 24\}$ (exactly $64$ of magnitude $8$), and $g = (W_f - 8)/16 \bmod 2$ is cubic with $\langle (-1)^f, W_g\rangle = -10240$. Every cubic has $\|W_g\|_1 \le 10240$, with equality only in two cases, A and B. Case~B is impossible. In case~A ($W_g \in \{\pm 16, \pm 48\}$), $h = T(g) := ((W_g/16 - 1)/2) \bmod 2$ is cubic with $T(h) = g$, and the cubic part $P$ of $g$ satisfies $J(J(P)) = P$ and $C(P) = 0$.
+  \item \emph{Classification, recomputed.} By Burnside's lemma over all $490$ conjugacy classes of $\mathrm{GL}(9,2)$, acting on cubic parts through the third compound matrix, $\mathrm{RM}(3,9)/\mathrm{RM}(2,9)$ has exactly $349$ orbits. The same code reproduces the known counts $6, 12, 32$ for $n = 6, 7, 8$. $\mathrm{GL}$-invariant colour refinement over the $511$ nonzero vectors separates all $349$ representatives listed by Brier and Langevin~\cite{BL2003}, so their list is complete. We use it only as a list of candidates.
+  \item \emph{Reduction, recomputed.} Only the classes $282$, $290$ and $349$ (the zero form) satisfy $J(J(P)) = P$ and $C(P) = 0$. The zero form has $\|W\|_1 \le 8192 < 10240$.
+  \item \emph{Classes $282$ and $290$, by exhaustive search.} For each class we enumerate all $g = P + q$ ($q$ quadratic; affine terms only permute or negate the spectrum, and $T^2(g + \ell) = T^2(g) + \ell$) that satisfy the $9$ linear necessary conditions of $W_g \equiv 16 \pmod{32}$: $2^{27}$ functions per class. Class $282$ has $18{,}923{,}520$ spectra inside $\{\pm 16, \pm 48\}$ and $5{,}996{,}544$ functions with $T^2(g) = g$; class $290$ has $22{,}118{,}400$ and $4{,}473{,}344$. In both classes, \textbf{no} function has both properties, so no NL-$244$ function exists. Among the $T^2(g) = g$ cases, $\max|W_g| \ge 80$, in agreement with~\cite[Table~1]{WLW2026}.
+\end{enumerate}
+Hence $\rho(1,9) < 244$; this is the hypothesis \code{CoveringRadius244} of the Lean development.
+
+\begin{theorem}[Maximum balanced nonlinearity in dimension $9$]
+\label{thm:main-nl240}
+No balanced $9$-variable Boolean function has nonlinearity $242$ (equivalently, every balanced $9$-variable Boolean function has Walsh peak strictly greater than $28$).
+Consequently, the maximum nonlinearity of a balanced $9$-variable Boolean function is
+\[
+  \nl_{\mathrm{bal}}(9) = 240,
+\]
+making $n = 9$ the smallest odd dimension where balance strictly lowers maximum nonlinearity ($240 < 242 \le \rho(1,9)$).
+\end{theorem}
+
+\begin{proof}[Proof structure and verification scope]
+The Lean~4 master theorem \code{Balanced242Master.no\_balanced\_9var\_nl242\_direct} (and equivalently \code{no\_balanced\_9var\_nl242}) formally reduces the coordinate-free non-existence claim to the explicit Layer~C hypotheses \code{SectionHypotheses}, \code{ComputationalClosures}, and \code{EndpointK16Direct} (or \code{CoveringRadius244}). Every agreement count $t \in \{0,2,\dots,256\}$ is then discharged: $t \le 84$, $t \in \{86,88,90,92\}$, $t=94$, $t=96$, and $t=98$ by the Lean kernel modules together with \code{nl242\_t96\_closure.zip} and \code{nl242\_t98\_closure.zip}; $t=100$ by the complete rank-$8$ and audited rank-$6$ proofs in \code{t100.tex}, \code{nl242\_top\_closure.zip}, and \code{t100\_r6\_audit/}; $t=102$--$110$ by \code{nl242\_top\_closure.zip}, \code{nl242\_middle\_closure.zip}, and the Lean upper-window modules; $t=112, 114, 118$, $t \ge 120$, and $t=116, k=12$ unconditionally inside Lean~4; and $t=116, k=16$ by the dual-verified direct endpoint closure in Section~\ref{sec:direct-endpoints} (as well as independently via Section~\ref{sec:nl244}). Combined with the balanced degree-$4$ / semi-bent construction of nonlinearity $240$ and the unbalanced $9$-variable nonlinearity-$242$ witnesses of~\cite{KMY2007}, this yields $\nl_{\mathrm{bal}}(9) = 240$.
+\end{proof}
+
+% ============================================================================
+\section{Formal Verification in Lean~4 and Trust Boundary}
+\label{sec:verification}
+% ============================================================================
+
+The Lean~4.15.0 formalization (zero external dependencies, zero Mathlib) covers the results in Layers~A and~B of Table~\ref{tab:trust}, culminating in the coordinate-free top-level master theorems \code{Balanced242Master.\allowbreak no\_balanced\_9var\_nl242\_direct} and \code{Balanced242Master.\allowbreak no\_balanced\_9var\_nl242}. It does not cover the large finite enumerations of Layer~C, which are parameterized as explicit hypotheses in \code{Balanced242Master}.
+The public replay archive (\code{nl242\_lean\_colab.tar.gz}) contains all \textbf{79} compiled modules with zero \code{sorry}, zero \code{native\_decide}, and zero custom axioms. Its exported theorems depend only on \code{[propext, Quot.sound]} or \code{[propext, Classical.choice, Quot.sound]}.
+
+\subsection{Three-Layer Trust Boundary}
+
+To make the verification scope completely transparent, we separate our artifacts into three distinct trust layers:
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}l>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{9.2cm}@{}}
+\toprule
+\textbf{Layer} & \textbf{Trusted Components} & \textbf{Results Covered} \\
+\midrule
+\textbf{Layer A} & Lean~4.15.0 kernel only (all 79 modules archived) &
+  Thm.~\ref{thm:no244} (no balanced NL244),
+  Lem.~\ref{lem:beta8-cube},
+  Thm.~\ref{thm:rank8-parity} (rank-$8$ parity),
+  Thm.~\ref{thm:anchor6364} ($63/64$ splitting),
+  Prop.~\ref{prop:emin} (\code{eminClosed}),
+  Thm.~\ref{thm:kraw-shifted} (shifted Krawtchouk),
+  Thm.~\ref{thm:barycenter} (barycenter laws),
+  Lem.~\ref{lem:residual},
+  Thm.~\ref{thm:code24} (Griesmer, Hamming, no $[24,8,\ge 10]_2$),
+  The normal form of Thm.~\ref{thm:t98-r6-z144} ($t=98, r=6, |Z|=144$),
+  Thm.~\ref{thm:t96-03139} ($t=96, (0,31,39)$ dichotomy),
+  \code{Balanced242T96Quartic} ($a=0$ far-half $\bmod\;4$ law),
+  \code{Balanced242QuarticHighBlock} (quartic inversion, hinges, dual cuts),
+  \code{Balanced242LowBlock} (low-block defect budget, $\bmod\;32$ autocorr, $t=106$ rank~$8$),
+  \code{Balanced242Z64Switch} (unconditional no rank~$2$ for $t \le 112$; $t=114,116$ plane switch),
+  \code{Balanced242T108R6} (unconditional $t=108$ rank~$6$ $|Z|=112$),
+  \code{Balanced242T104R8} (unconditional all $t \ge 104$ rank~$8$),
+  \code{Balanced242T112} (unconditional $t = 112$, all ranks, zero LP),
+  \code{Balanced242T114} (unconditional $t = 114$ and $t = 116, k = 12$ via $[12,9,4]$ sphere packing),
+  \code{Balanced242T118} (unconditional low-block $t = 118$ via kernel RREF cuts),
+  \code{Balanced242Endpoint} (unconditional $t \ge 120$). \\
+\midrule
+\textbf{Layer B} & Lean~4.15.0 kernel + explicit \code{SectionHypotheses} / \code{ComputationalClosures} / \code{EndpointK16Direct} (or \code{CoveringRadius244}) &
+  Thm.~\ref{thm:t94} (all $t \le 92$ coordinate-free, all 17 $t=94$ frontier profiles via 205 anchor-pair + 16 affine Farkas certs),
+  Thm.~\ref{thm:t96-profiles} ($(96,21,34,12)$, $(96,2,47,27)$, $(96,1,54,24)$, $(96,0,51,27)$),
+  and top-level coordinate-free master theorems \code{Balanced242Master.no\_balanced\_9var\_nl242\_direct} (using \code{EndpointK16Direct} for $t = 116, k = 16$) and \code{Balanced242Master.no\_balanced\_9var\_nl242} (using \code{CoveringRadius244}). \\
+\midrule
+\textbf{Layer C} & Independent C++17 / Python exact-arithmetic replay packets + SHA-256 manifests + positive controls &
+  Finite $7$-variable rank-$6$ section enumerations (\code{sel}, \code{sel2}, \code{sel\_e}, \code{flag\_sections}),
+  $t = 96$ quartic four-cell enumeration (\code{nl242\_t96\_closure.zip}),
+  $t = 98$ quartic four-cell enumerations + exact integer dual exclusions + $2^{21}$-character orbit-mass check (\code{nl242\_t98\_closure.zip}),
+  $t = 104$--$108$ middle-window reconstructions (\code{nl242\_middle\_closure.zip}),
+  $t=116, k=16$ direct high-block and low-complement enumeration (\code{nl242\_endpoint\_closure.zip}, cross-checked by \code{nl242\_endpoint\_crosscheck.zip}),
+  $t \ge 100$ low-block exact rational Farkas/LP duals and zero-LP $\mathrm{RM}(3,8)$ $\bmod\;8$ $y_Z$ verifiers (\code{nl242\_top\_closure.zip}),
+  and $\rho(1,9) < 244$: Burnside orbit count, class separation and exhaustive search over classes $282$ and $290$ (\code{nl244\_verify.zip}). \\
+\bottomrule
+\end{tabular}
+\caption{Explicit three-layer trust boundary of the verification artifact across all 79 archived Lean~4 modules and SHA-256-manifested Layer~C replay packets.}
+\label{tab:trust}
+\end{table}
+
+\subsection{Theorem-to-Lean Cross-Reference}
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{9.1cm}>{\raggedright\arraybackslash}p{2.3cm}@{}}
+\toprule
+\textbf{Paper Result} & \textbf{Lean~4 Module \& Identifier} & \textbf{External Hyp.?} \\
+\midrule
+Thm.~\ref{thm:no244} & \code{Balanced242No244.no\_balanced\_nl244}, \code{peak28\_of\_cap28} & No \\
+Thm.~\ref{thm:rank8-parity} & \code{Balanced242Parity.rank\_eq\_8\_iff\_k\_odd} & No \\
+Thm.~\ref{thm:anchor6364} & \code{Balanced242AnchorPair.anchor\_pair\_ranks\_63\_64} & No \\
+Prop.~\ref{prop:emin} & \code{Balanced242Farkas.eminClosed\_le\_secExc} & No \\
+Thm.~\ref{thm:kraw-shifted} & \code{Balanced242Centered.kraw\_triple\_shifted\_nonneg\_and\_mod} & No \\
+Thm.~\ref{thm:barycenter} & \code{Balanced242Centered.barycenter\_translate\_odd}, \code{cut\_sum\_eq\_half} & No \\
+Lem.~\ref{lem:residual} & \code{Balanced242Centered.residual\_kernel\_counts} & No \\
+Thm.~\ref{thm:code24} & \code{Balanced242Centered.griesmer\_bound}, \code{sphere\_packing\_d3}, \code{no\_binary\_code\_24\_8\_10} & No \\
+Thm.~\ref{thm:t98-r6-z144} (normal form) & \code{Balanced242T98R6Z144.no\_t98\_r6\_z144} & No \\
+Thm.~\ref{thm:t96-03139} & \code{Balanced242T96Arith.t96\_0\_31\_39\_dichotomy} & No \\
+Quartic high-block theory & \code{Balanced242QuarticHighBlock.high\_block\_inversion}, \code{hinge\_bound}, \code{dual\_cut\_sound} & No \\
+Low-block budget \& $t=106$ r8 & \code{Balanced242LowBlock.low\_defect\_budget}, \code{low\_autocorr\_mod32}, \code{no\_t106\_rank8} & No \\
+Rank~$2$ ($t \le 112$) \& switch & \code{Balanced242Z64Switch.no\_Z64\_of\_t\_le\_112}, \code{endpoint\_switched\_blocks} & No \\
+$t=108$ rank~$6$ $|Z|=112$ & \code{Balanced242T108R6.no\_t108\_rank6}, \code{cube8\_weight\_cases} & No \\
+All $t \ge 104$ rank~$8$ & \code{Balanced242T104R8.no\_t104\_rank8}, \code{no\_rank8\_of\_t\_ge\_104} & No \\
+Unconditional $t = 112$ & \code{Balanced242T112.no\_t112}, \code{rank4\_Z96\_n0\_ge8} & No \\
+Unconditional $t = 114$ \& $k=12$ & \code{Balanced242T114.no\_t114}, \code{t116\_forces\_k16} & No \\
+Unconditional $t = 118$ & \code{Balanced242T118.no\_t118} (low-block only, kernel RREF) & No \\
+Unconditional $t \ge 120$ & \code{Balanced242Endpoint.low\_agreements\_below\_120} & No \\
+Thm.~\ref{thm:t94} ($t\le 92$) & \code{Balanced242LowRange.axisAgreements\_ge\_188}, \code{autocorr\_ge\_m136} & \code{SectionEnum} \\
+Thm.~\ref{thm:t94} ($17$ frontier profiles) & \code{Balanced242T94.t94\_all\_17\_frontier\_excluded} & \code{SectionEnumE} \\
+Other $t=94$ profiles & \code{ComputationalClosures.t94\_nonfrontier} & Yes \\
+Thm.~\ref{thm:t96-profiles} & \code{Balanced242T94.t96\_21\_34\_12\_excluded}, \code{Balanced242T96Centered.excl\_96\_*}, \code{Balanced242T96\_0\_51\_27} & \code{SectionEnumE} \\
+Thm.~\ref{thm:main-nl240} (Master) & \code{Balanced242Master.no\_balanced\_9var\_nl242\_direct}, \code{no\_balanced\_9var\_nl242} & Layers~B \& C \\
+\bottomrule
+\end{tabular}
+\caption{Mapping between results in this paper and the 79 archived zero-Mathlib Lean~4 modules.}
+\label{tab:xref}
+\end{table}
+
+\subsection{Computer-Assisted Proof and Reproducibility}
+This is a computer-assisted proof, and its correctness includes the correctness of our code. We therefore publish all of it.
+The Lean~4 source archive (\code{nl242\_lean\_colab.tar.gz}, all 79 modules) and the Google Colab notebook (\code{verify\_nl242\_colab.ipynb}) replay all 79 zero-Mathlib modules sequentially on a standard CPU runtime, with no Mathlib download.
+The finite enumerations ship as SHA-256-manifested replay packets with all paths relative:
+\code{nl242\_t96\_closure.zip} ($t = 96$),
+\code{nl242\_t98\_closure.zip} ($t = 98$),
+\code{nl242\_middle\_closure.zip} ($t = 104$--$108$),
+\code{nl242\_top\_closure.zip} ($t \ge 100$ and $t = 84$),
+\code{nl242\_endpoint\_closure.zip} (direct exclusion at $t=114,116$),
+\code{nl242\_endpoint\_crosscheck.zip} (separate re-derivation of the $k=16$ endpoint calculation),
+and \code{nl244\_verify.zip} ($\rho(1,9) < 244$).
+Each packet's README gives the replay commands and the expected output, and each packet includes positive controls where an enumerator could otherwise pass vacuously.
+The heaviest steps were replayed independently from these packets on a fresh machine. All $t = 100$ rank-$6$ reductions are proved in full in \code{t100.tex} and verified inside \code{nl242\_top\_closure.zip} (\code{proofs/PROOF\_t100\_RANK6.md}, wired into \code{verify\_quick.sh}).
+
+\section*{Acknowledgments}
+The author thanks AI research and coding assistants---Antigravity (Google), Claude (Anthropic), and ChatGPT/Codex (OpenAI)---for assistance with proof exploration, C++/Python enumerator and certificate tooling, Lean~4 formalization, and manuscript preparation. The Lean~4 formalization (under development) checks the results listed in Layers~A and~B of Table~\ref{tab:trust}. The finite enumerations and exact rational/integer certificates are checked by the published C++ and Python verifiers, provided with SHA-256 replay packets and positive controls. We thank Qichun Wang, Yueying Lou, and Zifan Wang for the argument behind Section~\ref{sec:nl244}, and E.~Brier and P.~Langevin for their published list of cubic forms.
+
+% ============================================================================
+\begin{thebibliography}{9}
+
+\bibitem{BL2003}
+\'E.~Brier and P.~Langevin,
+Classification of Boolean cubic forms of nine variables,
+in \emph{Proc. 2003 IEEE Information Theory Workshop}, 2003, pp.~179--182.
+Representative list: \url{https://langevin.univ-tln.fr/project/cubics/classification.txt}.
+
+\bibitem{Carlet2021}
+C.~Carlet,
+\emph{Boolean Functions for Cryptography and Coding Theory},
+Cambridge University Press, 2021.
+
+\bibitem{Delsarte1973}
+P.~Delsarte,
+\emph{An Algebraic Approach to the Association Schemes of Coding Theory},
+Philips Research Reports Supplements, No.~10, 1973.
+
+\bibitem{Griesmer1960}
+J.~H.~Griesmer,
+A bound for error-correcting codes,
+\emph{IBM Journal of Research and Development} \textbf{4} (1960), 532--542.
+
+\bibitem{KMY2006}
+S.~Kavut, S.~Maitra, and M.~D.~Y\"ucel,
+There exist Boolean functions on $n$ (odd) variables having nonlinearity $> 2^{n-1} - 2^{(n-1)/2}$ if and only if $n > 7$,
+\emph{IACR Cryptology ePrint Archive}, Report 2006/181, 2006.
+
+\bibitem{KMY2007}
+S.~Kavut, S.~Maitra, and M.~D.~Y\"ucel,
+Search for Boolean functions with excellent profiles in the rotation symmetric class,
+\emph{IEEE Transactions on Information Theory} \textbf{53} (2007), no.~5, 1743--1751.
+
+\bibitem{KY2010}
+S.~Kavut and M.~D.~Y\"ucel,
+$9$-variable Boolean functions with nonlinearity $242$ in the generalized rotation symmetric class,
+\emph{Information and Computation} \textbf{208} (2010), no.~4, 341--350.
+
+\bibitem{Mykkeltveit1980}
+J.~Mykkeltveit,
+The covering radius of the $(128,8)$ Reed--Muller code is $56$,
+\emph{IEEE Transactions on Information Theory} \textbf{26} (1980), no.~3, 359--362.
+\url{https://doi.org/10.1109/TIT.1980.1056187}.
+
+\bibitem{PW1983}
+N.~J.~Patterson and D.~H.~Wiedemann,
+The covering radius of the $(2^{15}, 16)$ Reed--Muller code is at least $16276$,
+\emph{IEEE Transactions on Information Theory} \textbf{29} (1983), no.~3, 354--356.
+
+\bibitem{WLW2026}
+Q.~Wang, Y.~Lou, and Z.~Wang,
+The covering radius of the Reed--Muller code $\mathrm{RM}(1,9)$ is $242$,
+arXiv:2610.17871 [cs.IT], v1, 2026 (preprint).
+
+\end{thebibliography}
+
+\end{document}
