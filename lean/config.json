@@ -1,0 +1,15 @@
+{
+    "challenge_module": "Challenge",
+    "solution_module": "Solution",
+    "theorem_names": [
+        "NL242Challenge.no_balanced_9var_nl244",
+        "NL242Challenge.no_adapted_t112",
+        "NL242Challenge.no_adapted_t114",
+        "NL242Challenge.no_adapted_t118",
+        "NL242Challenge.no_adapted_t_ge_120",
+        "NL242Challenge.endpointK16_of_coveringRadius",
+        "NL242Challenge.no_balanced_9var_nl242_direct",
+        "NL242Challenge.no_balanced_9var_nl242_covering"
+    ],
+    "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
