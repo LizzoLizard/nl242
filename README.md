@@ -7,3 +7,7 @@ We develop a spectral-phase plateau theory for putative balanced $9$-variable fu
 Author's Note on Proof Status:
 
 A computer-assisted proof can be mathematically unconditional without every computation being formalized within Lean. In this work, Lean verifies the structural reductions, while the remaining finite computational obligations are discharged by explicitly supplied, reproducible verification procedures and certificates. The theorem therefore does not depend on unproved mathematical conjectures; its validity rests on the correctness and completeness of the accompanying mathematical arguments and computational verification.
+
+## Acknowledgments
+
+Claude (Anthropic) assisted with repository discoverability: hosting the manuscript PDF on the project page, citation links, and search-engine verification.
