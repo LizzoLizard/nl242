@@ -1,0 +1,20 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "NL242: The Maximum Nonlinearity of Balanced Nine-Variable Boolean Functions",
+  "description": "Research code, Lean 4 structural proofs and exact computational replay certificates accompanying a November 2026 preprint proposing a computer-assisted proof that the maximum nonlinearity of balanced nine-variable Boolean functions is 240.",
+  "identifier": "https://doi.org/10.5281/zenodo.24447815",
+  "codeRepository": "https://github.com/LizzoLizard/nl242",
+  "url": "https://github.com/LizzoLizard/nl242",
+  "author": [{"@type": "Person", "givenName": "Daniel Ayomide", "familyName": "Shittu"}],
+  "license": "https://spdx.org/licenses/MIT.html",
+  "programmingLanguage": ["Lean 4", "C++", "Python"],
+  "runtimePlatform": "Lean 4.15.0",
+  "keywords": ["balanced Boolean functions", "nine-variable Boolean functions", "maximum nonlinearity", "Walsh-Hadamard transform", "Reed-Muller codes", "covering radius", "coding theory", "cryptography", "formal verification", "computer-assisted proof", "NL242"],
+  "referencePublication": {
+    "@type": "ScholarlyArticle",
+    "name": "No Balanced 9-Variable Boolean Function Has Nonlinearity 242: Spectral-Phase Obstructions, Formalized Exclusions, and Exact Certificates",
+    "author": [{"@type": "Person", "givenName": "Daniel Ayomide", "familyName": "Shittu"}],
+    "url": "https://doi.org/10.5281/zenodo.24447815"
+  }
+}
