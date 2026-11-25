@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this research, please cite it using the following metadata."
+title: "The Maximum Nonlinearity of Balanced Nine-Variable Boolean Functions"
+authors:
+  - family-names: "Shittu"
+    given-names: "Daniel Ayomide"
+type: software
+date-released: 2026-11-22
+doi: "10.5281/zenodo.24447815"
+url: "https://github.com/LizzoLizard/nl242"
+repository-code: "https://github.com/LizzoLizard/nl242"
+keywords:
+  - Boolean functions
+  - Balanced Boolean functions
+  - Maximum nonlinearity
+  - Walsh-Hadamard transform
+  - Reed-Muller codes
+  - Covering radius
+  - Coding theory
+  - Cryptography
+  - Lean 4
+  - Formal verification
+  - NL242
